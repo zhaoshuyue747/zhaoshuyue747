@@ -3,158 +3,149 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>头部 & 超头部客户分析大屏</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>东莞橙辉 · 头部&超头部客户分析大屏</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <style>
-  :root {
-    --bg: #0d1117;
-    --bg2: #161b22;
-    --bg3: #1c2230;
-    --card: #1e2433;
-    --card2: #252d3d;
-    --border: #2d3748;
-    --text: #e2e8f0;
-    --text2: #94a3b8;
-    --text3: #64748b;
-    --super: #f59e0b;
-    --super-bg: rgba(245,158,11,0.12);
-    --super-border: rgba(245,158,11,0.35);
-    --head: #38bdf8;
-    --head-bg: rgba(56,189,248,0.10);
-    --head-border: rgba(56,189,248,0.30);
-    --green: #34d399;
-    --green-bg: rgba(52,211,153,0.10);
-    --red: #f87171;
-    --red-bg: rgba(248,113,113,0.10);
-    --warn: #fb923c;
-    --warn-bg: rgba(251,146,60,0.12);
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif; min-height: 100vh; }
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#1c2230;--card:#1e2433;--card2:#252d3d;
+  --border:#2d3748;--text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;
+  --super:#f59e0b;--super-bg:rgba(245,158,11,.12);--super-border:rgba(245,158,11,.35);
+  --head:#38bdf8;--head-bg:rgba(56,189,248,.10);--head-border:rgba(56,189,248,.30);
+  --green:#34d399;--green-bg:rgba(52,211,153,.10);
+  --red:#f87171;--red-bg:rgba(248,113,113,.10);
+  --warn:#fb923c;--warn-bg:rgba(251,146,60,.12);
+  --purple:#a78bfa;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Microsoft YaHei','PingFang SC',sans-serif;min-height:100vh}
 
-  /* ===== HEADER ===== */
-  .header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; }
-  .header-title { font-size: 20px; font-weight: 600; letter-spacing: 1px; }
-  .header-title span.super { color: var(--super); }
-  .header-title span.head { color: var(--head); }
-  .header-meta { font-size: 12px; color: var(--text3); display: flex; gap: 20px; }
-  .header-meta b { color: var(--text2); }
+.header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between}
+.header-title{font-size:20px;font-weight:600;letter-spacing:1px}
+.header-title .super{color:var(--super)}
+.header-title .head{color:var(--head)}
+.header-meta{font-size:12px;color:var(--text3);display:flex;gap:20px}
+.header-meta b{color:var(--text2)}
 
-  /* ===== TABS ===== */
-  .tabs { display: flex; gap: 4px; padding: 14px 28px 0; background: var(--bg2); border-bottom: 1px solid var(--border); }
-  .tab { padding: 8px 20px; font-size: 13px; cursor: pointer; color: var(--text2); border-radius: 6px 6px 0 0; border: 1px solid transparent; border-bottom: none; transition: all .2s; }
-  .tab:hover { color: var(--text); background: var(--bg3); }
-  .tab.active { color: var(--text); background: var(--bg); border-color: var(--border); }
+.tabs{display:flex;gap:4px;padding:14px 28px 0;background:var(--bg2);border-bottom:1px solid var(--border)}
+.tab{padding:8px 20px;font-size:13px;cursor:pointer;color:var(--text2);border-radius:6px 6px 0 0;border:1px solid transparent;border-bottom:none;transition:all .2s}
+.tab:hover{color:var(--text);background:var(--bg3)}
+.tab.active{color:var(--text);background:var(--bg);border-color:var(--border)}
 
-  /* ===== MAIN LAYOUT ===== */
-  .page { display: none; padding: 20px 28px; }
-  .page.active { display: block; }
+.page{display:none;padding:20px 28px}
+.page.active{display:block}
 
-  /* ===== KPI CARDS ===== */
-  .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 20px; }
-  .kpi-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
-  .kpi-label { font-size: 11px; color: var(--text3); margin-bottom: 6px; }
-  .kpi-val { font-size: 24px; font-weight: 600; line-height: 1; }
-  .kpi-sub { font-size: 11px; color: var(--text2); margin-top: 5px; }
-  .kpi-card.super-card { border-color: var(--super-border); background: linear-gradient(135deg, var(--card), var(--super-bg)); }
-  .kpi-card.head-card { border-color: var(--head-border); background: linear-gradient(135deg, var(--card), var(--head-bg)); }
-  .kpi-card.warn-card { border-color: rgba(251,146,60,0.4); background: linear-gradient(135deg, var(--card), var(--warn-bg)); }
-  .super-val { color: var(--super); }
-  .head-val { color: var(--head); }
-  .green { color: var(--green); }
-  .red { color: var(--red); }
-  .warn-val { color: var(--warn); }
+/* KPI */
+.kpi-row{display:grid;gap:14px;margin-bottom:20px}
+.kpi-5{grid-template-columns:repeat(5,1fr)}
+.kpi-4{grid-template-columns:repeat(4,1fr)}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.kpi-label{font-size:11px;color:var(--text3);margin-bottom:6px}
+.kpi-val{font-size:24px;font-weight:600;line-height:1}
+.kpi-sub{font-size:11px;color:var(--text2);margin-top:5px}
+.kpi-card.super-card{border-color:var(--super-border);background:linear-gradient(135deg,var(--card),var(--super-bg))}
+.kpi-card.head-card{border-color:var(--head-border);background:linear-gradient(135deg,var(--card),var(--head-bg))}
+.kpi-card.warn-card{border-color:rgba(251,146,60,.4);background:linear-gradient(135deg,var(--card),var(--warn-bg))}
+.kpi-card.red-card{border-color:rgba(248,113,113,.4);background:linear-gradient(135deg,var(--card),var(--red-bg))}
+.super-val{color:var(--super)}
+.head-val{color:var(--head)}
+.green{color:var(--green)}
+.red{color:var(--red)}
+.warn-val{color:var(--warn)}
+.purple{color:var(--purple)}
 
-  /* ===== CHART GRID ===== */
-  .chart-row { display: grid; gap: 14px; margin-bottom: 20px; }
-  .chart-row-2 { grid-template-columns: 1fr 1fr; }
-  .chart-row-3 { grid-template-columns: 2fr 1fr 1fr; }
-  .chart-row-full { grid-template-columns: 1fr; }
-  .chart-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
-  .chart-title { font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-  .chart-title .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-  .chart-wrap { position: relative; width: 100%; }
-  .chart-wrap canvas { max-width: 100%; }
+/* gauge */
+.gauge-wrap{position:relative;text-align:center;padding:8px 0 4px}
+.gauge-label{font-size:11px;color:var(--text3);margin-top:4px}
 
-  /* ===== SALES TABLE ===== */
-  .table-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
-  .table-header-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 10px; }
-  .table-title { font-size: 13px; font-weight: 500; color: var(--text2); }
-  .filter-row { display: flex; gap: 8px; }
-  .filter-btn { padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--text2); font-size: 11px; cursor: pointer; transition: all .2s; }
-  .filter-btn.active, .filter-btn:hover { background: var(--bg3); color: var(--text); border-color: var(--text3); }
+/* charts */
+.chart-row{display:grid;gap:14px;margin-bottom:20px}
+.chart-row-2{grid-template-columns:1fr 1fr}
+.chart-row-3{grid-template-columns:1fr 1fr 1fr}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
+.chart-title{font-size:13px;font-weight:500;color:var(--text2);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.chart-title .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.chart-wrap{position:relative;width:100%}
 
-  table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  thead tr { background: var(--bg2); }
-  th { padding: 8px 12px; text-align: left; color: var(--text3); font-weight: 500; white-space: nowrap; border-bottom: 1px solid var(--border); }
-  td { padding: 8px 12px; border-bottom: 1px solid rgba(45,55,72,0.5); color: var(--text); white-space: nowrap; }
-  tbody tr:hover { background: var(--card2); }
-  tbody tr:last-child td { border-bottom: none; }
+/* rank */
+.rank-list{display:flex;flex-direction:column;gap:8px}
+.rank-item{display:flex;align-items:center;gap:10px}
+.rank-no{font-size:11px;color:var(--text3);width:18px;text-align:center;flex-shrink:0}
+.rank-name{font-size:12px;color:var(--text);flex-shrink:0;width:155px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rank-bar-wrap{flex:1;background:var(--bg3);border-radius:3px;height:18px;position:relative}
+.rank-bar-fill{height:100%;border-radius:3px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px}
+.rank-bar-val{font-size:10px;font-weight:500}
+.rank-meta{font-size:10px;color:var(--text3);width:55px;text-align:right;flex-shrink:0}
 
-  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 500; }
-  .badge-super { background: var(--super-bg); color: var(--super); border: 1px solid var(--super-border); }
-  .badge-head { background: var(--head-bg); color: var(--head); border: 1px solid var(--head-border); }
-  .badge-warn { background: var(--red-bg); color: var(--red); border: 1px solid rgba(248,113,113,0.3); }
-  .badge-ok { background: var(--green-bg); color: var(--green); border: 1px solid rgba(52,211,153,0.3); }
-  .badge-mid { background: rgba(251,146,60,0.1); color: var(--warn); border: 1px solid rgba(251,146,60,0.3); }
+/* table */
+.table-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.table-header-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px}
+.table-title{font-size:13px;font-weight:500;color:var(--text2)}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap}
+.filter-btn{padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:11px;cursor:pointer;transition:all .2s}
+.filter-btn.active,.filter-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--text3)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead tr{background:var(--bg2)}
+th{padding:8px 10px;text-align:left;color:var(--text3);font-weight:500;white-space:nowrap;border-bottom:1px solid var(--border)}
+td{padding:8px 10px;border-bottom:1px solid rgba(45,55,72,.5);color:var(--text);white-space:nowrap}
+tbody tr:hover{background:var(--card2)}
+tbody tr:last-child td{border-bottom:none}
 
-  /* ===== SALES CARD GRID ===== */
-  .sales-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
-  .sales-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; cursor: pointer; transition: all .2s; }
-  .sales-card:hover { border-color: var(--text3); transform: translateY(-2px); }
-  .sales-card.selected { border-color: var(--head); box-shadow: 0 0 0 1px var(--head); }
-  .sc-name { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
-  .sc-row { display: flex; justify-content: space-between; font-size: 11px; margin-top: 4px; }
-  .sc-label { color: var(--text3); }
-  .sc-val { color: var(--text2); }
-  .sc-revenue { font-size: 20px; font-weight: 600; color: var(--text); margin: 6px 0; }
-  .sc-badges { display: flex; gap: 6px; margin-top: 8px; }
-  .sc-bar { height: 3px; border-radius: 2px; background: var(--border); margin-top: 10px; }
-  .sc-bar-fill { height: 100%; border-radius: 2px; }
-  .sc-mini-kpi { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
-  .sc-mini-item { background: var(--bg3); border-radius: 6px; padding: 6px 8px; }
-  .sc-mini-label { font-size: 10px; color: var(--text3); }
-  .sc-mini-val { font-size: 13px; font-weight: 500; color: var(--text); }
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:500}
+.badge-super{background:var(--super-bg);color:var(--super);border:1px solid var(--super-border)}
+.badge-head{background:var(--head-bg);color:var(--head);border:1px solid var(--head-border)}
+.badge-warn{background:var(--red-bg);color:var(--red);border:1px solid rgba(248,113,113,.3)}
+.badge-ok{background:var(--green-bg);color:var(--green);border:1px solid rgba(52,211,153,.3)}
+.badge-mid{background:rgba(251,146,60,.1);color:var(--warn);border:1px solid rgba(251,146,60,.3)}
 
-  /* ===== RANK BAR ===== */
-  .rank-list { display: flex; flex-direction: column; gap: 8px; }
-  .rank-item { display: flex; align-items: center; gap: 10px; }
-  .rank-no { font-size: 11px; color: var(--text3); width: 18px; text-align: center; flex-shrink: 0; }
-  .rank-name { font-size: 12px; color: var(--text); flex-shrink: 0; width: 160px; overflow: hidden; text-overflow: ellipsis; }
-  .rank-bar-wrap { flex: 1; background: var(--bg3); border-radius: 3px; height: 18px; position: relative; }
-  .rank-bar-fill { height: 100%; border-radius: 3px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; }
-  .rank-bar-val { font-size: 10px; font-weight: 500; }
-  .rank-meta { font-size: 10px; color: var(--text3); width: 55px; text-align: right; flex-shrink: 0; }
+/* sales cards */
+.sales-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.sales-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all .2s}
+.sales-card:hover{border-color:var(--text3);transform:translateY(-2px)}
+.sales-card.selected{border-color:var(--head);box-shadow:0 0 0 1px var(--head)}
+.sc-name{font-size:14px;font-weight:600;margin-bottom:6px}
+.sc-revenue{font-size:20px;font-weight:600;margin:4px 0}
+.sc-badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.sc-bar{height:3px;border-radius:2px;background:var(--border);margin-top:8px}
+.sc-bar-fill{height:100%;border-radius:2px}
+.sc-mini-kpi{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
+.sc-mini-item{background:var(--bg3);border-radius:6px;padding:5px 7px}
+.sc-mini-label{font-size:10px;color:var(--text3)}
+.sc-mini-val{font-size:12px;font-weight:500;color:var(--text)}
 
-  /* ===== DETAIL PAGE ===== */
-  .search-bar { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 8px 16px; display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-  .search-bar input { background: transparent; border: none; outline: none; color: var(--text); font-size: 13px; flex: 1; font-family: inherit; }
-  .search-bar input::placeholder { color: var(--text3); }
-  .pagination { display: flex; align-items: center; gap: 8px; padding: 10px 16px; justify-content: flex-end; }
-  .page-btn { padding: 4px 10px; border: 1px solid var(--border); background: transparent; color: var(--text2); border-radius: 6px; cursor: pointer; font-size: 11px; }
-  .page-btn:hover, .page-btn.active-pg { background: var(--bg3); color: var(--text); }
-  .page-info { font-size: 11px; color: var(--text3); }
+/* completion bar */
+.comp-bar-wrap{margin-top:8px}
+.comp-bar-label{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:3px}
+.comp-bar-bg{height:6px;border-radius:3px;background:var(--border)}
+.comp-bar-fill{height:100%;border-radius:3px;transition:width .6s ease}
 
-  /* ===== RISK PAGE ===== */
-  .risk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .risk-section-title { font-size: 12px; color: var(--text3); padding: 10px 16px 6px; letter-spacing: 0.5px; text-transform: uppercase; }
-  .risk-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-bottom: 1px solid rgba(45,55,72,0.4); }
-  .risk-item:last-child { border-bottom: none; }
-  .risk-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
-  .risk-content { flex: 1; min-width: 0; }
-  .risk-cname { font-size: 12px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .risk-meta { font-size: 11px; color: var(--text3); margin-top: 2px; }
+/* risk */
+.risk-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.risk-section-title{font-size:12px;color:var(--text3);padding:10px 16px 6px;letter-spacing:.5px;text-transform:uppercase}
+.risk-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(45,55,72,.4)}
+.risk-item:last-child{border-bottom:none}
+.risk-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.risk-content{flex:1;min-width:0}
+.risk-cname{font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.risk-meta{font-size:11px;color:var(--text3);margin-top:2px}
+.risk-pct{font-size:13px;font-weight:600;color:var(--red);margin-left:auto;flex-shrink:0;padding-left:8px}
 
-  /* scroll */
-  ::-webkit-scrollbar { width: 4px; height: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+/* pagination */
+.pagination{display:flex;align-items:center;gap:8px;padding:10px 16px;justify-content:flex-end}
+.page-btn{padding:4px 10px;border:1px solid var(--border);background:transparent;color:var(--text2);border-radius:6px;cursor:pointer;font-size:11px}
+.page-btn:hover,.page-btn.active-pg{background:var(--bg3);color:var(--text)}
+.page-info{font-size:11px;color:var(--text3)}
 
-  @media (max-width: 900px) {
-    .kpi-row { grid-template-columns: repeat(3, 1fr); }
-    .sales-grid { grid-template-columns: repeat(2, 1fr); }
-    .chart-row-2, .chart-row-3 { grid-template-columns: 1fr; }
-  }
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+@media(max-width:900px){
+  .kpi-5,.kpi-4{grid-template-columns:repeat(2,1fr)}
+  .sales-grid{grid-template-columns:repeat(2,1fr)}
+  .chart-row-2,.chart-row-3{grid-template-columns:1fr}
+  .risk-grid{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -164,7 +155,7 @@
     东莞橙辉 · <span class="super">超头部</span> & <span class="head">头部</span>客户分析大屏
   </div>
   <div class="header-meta">
-    <span>数据截至 <b id="dataDate">2026-07</b></span>
+    <span>数据截至 <b>2026-07-23</b></span>
     <span>客户总数 <b id="totalCnt">88</b></span>
     <span>拍档销售 <b>8人</b></span>
   </div>
@@ -177,27 +168,27 @@
   <div class="tab" onclick="switchTab('risk')">预警分析</div>
 </div>
 
-<!-- ========== 总览 ========== -->
+<!-- ======= 总览 ======= -->
 <div class="page active" id="page-overview">
-  <div class="kpi-row" id="kpi-overview"></div>
+  <div class="kpi-row kpi-5" id="kpi-overview"></div>
   <div class="chart-row chart-row-2">
     <div class="chart-card">
       <div class="chart-title"><span class="dot" style="background:var(--super)"></span>各销售财年实收对比（万元）</div>
       <div class="chart-wrap" style="height:240px"><canvas id="chartRevByPerson"></canvas></div>
     </div>
     <div class="chart-card">
-      <div class="chart-title"><span class="dot" style="background:var(--head)"></span>各销售客户数量分布</div>
-      <div class="chart-wrap" style="height:240px"><canvas id="chartCntByPerson"></canvas></div>
+      <div class="chart-title"><span class="dot" style="background:var(--purple)"></span>当月实收 vs 目标（万元）</div>
+      <div class="chart-wrap" style="height:240px"><canvas id="chartMonthTarget"></canvas></div>
     </div>
   </div>
   <div class="chart-row chart-row-2">
     <div class="chart-card">
-      <div class="chart-title"><span class="dot" style="background:var(--green)"></span>财年实收同比增长率 %（各销售）</div>
-      <div class="chart-wrap" style="height:220px"><canvas id="chartYoY"></canvas></div>
+      <div class="chart-title"><span class="dot" style="background:var(--green)"></span>各销售当月完成率 %</div>
+      <div class="chart-wrap" style="height:210px"><canvas id="chartCompletion"></canvas></div>
     </div>
     <div class="chart-card">
-      <div class="chart-title"><span class="dot" style="background:#a78bfa)"></span>超头部客户财年实收 TOP15</div>
-      <div class="rank-list" id="rankSuper" style="max-height:220px;overflow-y:auto;padding-right:4px"></div>
+      <div class="chart-title"><span class="dot" style="background:var(--super)"></span>超头部客户当月实收 TOP15</div>
+      <div class="rank-list" id="rankSuper" style="max-height:210px;overflow-y:auto;padding-right:4px"></div>
     </div>
   </div>
   <div class="chart-row chart-row-2">
@@ -206,18 +197,18 @@
       <div class="chart-wrap" style="height:200px"><canvas id="chartQuality"></canvas></div>
     </div>
     <div class="chart-card">
-      <div class="chart-title"><span class="dot" style="background:var(--warn)"></span>头部客户财年实收 TOP10</div>
+      <div class="chart-title"><span class="dot" style="background:var(--head)"></span>头部客户当月实收 TOP10</div>
       <div class="rank-list" id="rankHead" style="max-height:200px;overflow-y:auto;padding-right:4px"></div>
     </div>
   </div>
 </div>
 
-<!-- ========== 销售维度 ========== -->
+<!-- ======= 销售维度 ======= -->
 <div class="page" id="page-sales">
   <div class="sales-grid" id="salesCardGrid"></div>
-  <div class="chart-row chart-row-2" id="salesDetailCharts">
+  <div class="chart-row chart-row-2">
     <div class="chart-card">
-      <div class="chart-title" id="salesChartTitle1">选中销售 · 超头部/头部收入拆分</div>
+      <div class="chart-title" id="salesChartTitle1">选中销售 · 超头部/头部拆分</div>
       <div class="chart-wrap" style="height:240px"><canvas id="chartSalesLayer"></canvas></div>
     </div>
     <div class="chart-card">
@@ -227,7 +218,7 @@
   </div>
 </div>
 
-<!-- ========== 客户明细 ========== -->
+<!-- ======= 客户明细 ======= -->
 <div class="page" id="page-detail">
   <div class="table-card">
     <div class="table-header-row">
@@ -243,9 +234,10 @@
       <table>
         <thead><tr>
           <th>#</th><th>客户名称</th><th>拍档销售</th><th>层级</th>
-          <th>财年实收</th><th>上财年同期</th><th>财年同比</th>
-          <th>当月实收</th><th>月均GMV</th><th>优品数</th><th>爆品数</th>
-          <th>合作意愿</th><th>实收预警</th><th>拜访风险</th><th>主营行业</th>
+          <th>当月实收</th><th>当月目标</th><th>当月完成率</th><th>当月同比</th>
+          <th>财年实收</th><th>财年同比</th>
+          <th>月均GMV</th><th>优品数</th><th>爆品数</th>
+          <th>合作意愿</th><th>拜访风险</th><th>主营行业</th>
         </tr></thead>
         <tbody id="detailTbody"></tbody>
       </table>
@@ -254,52 +246,55 @@
   </div>
 </div>
 
-<!-- ========== 预警分析 ========== -->
+<!-- ======= 预警分析 ======= -->
 <div class="page" id="page-risk">
-  <div class="kpi-row" id="kpi-risk" style="grid-template-columns:repeat(4,1fr)"></div>
+  <div class="kpi-row kpi-4" id="kpi-risk"></div>
   <div class="risk-grid">
     <div class="table-card">
+      <div class="risk-section-title" style="color:var(--red)">📉 当月实收下滑超20%（共 <span id="drop20-cnt">0</span> 个客户）</div>
+      <div id="riskDrop20" style="max-height:380px;overflow-y:auto"></div>
+    </div>
+    <div class="table-card">
       <div class="risk-section-title" style="color:var(--red)">🔴 拜访高风险（>60天未有效拜访）</div>
-      <div id="riskHigh"></div>
+      <div id="riskHigh" style="max-height:180px;overflow-y:auto"></div>
+      <div class="risk-section-title" style="color:var(--warn);margin-top:4px">🟡 拜访中风险（30-60天）</div>
+      <div id="riskMid" style="max-height:180px;overflow-y:auto"></div>
     </div>
     <div class="table-card">
-      <div class="risk-section-title" style="color:var(--warn)">🟡 拜访中风险（30-60天）</div>
-      <div id="riskMid"></div>
+      <div class="risk-section-title" style="color:var(--super)">⭐ 合作意愿偏低待跟进</div>
+      <div id="riskLowIntent" style="max-height:360px;overflow-y:auto"></div>
     </div>
     <div class="table-card">
-      <div class="risk-section-title" style="color:var(--red)">💰 实收预警客户</div>
-      <div id="riskRev"></div>
-    </div>
-    <div class="table-card">
-      <div class="risk-section-title" style="color:var(--super)">⭐ 合作意愿低待跟进</div>
-      <div id="riskLowIntent"></div>
+      <div class="risk-section-title" style="color:var(--head)">📊 各销售当月完成率概览</div>
+      <div id="riskCompTable" style="padding:0 0 8px"></div>
     </div>
   </div>
 </div>
 
 <script>
-// ======================== DATA ========================
-const RAW_DATA = {"sales_summary": [{"拍档销售": "刘鑫", "总客户数": 7, "超头部客户数": 1, "头部客户数": 6, "财年实收": 2211347, "上财年同期实收": 2370154, "当月实收": 491583, "月均GMV": 552350, "优品数": 1576, "爆品数": 109, "高合作意愿数": 6, "拜访预警数": 4, "财年同比": -6.7}, {"拍档销售": "李朝燕", "总客户数": 4, "超头部客户数": 2, "头部客户数": 2, "财年实收": 3312683, "上财年同期实收": 2870087, "当月实收": 849531, "月均GMV": 1003619, "优品数": 276, "爆品数": 13, "高合作意愿数": 3, "拜访预警数": 3, "财年同比": 15.4}, {"拍档销售": "杨婷婷", "总客户数": 14, "超头部客户数": 9, "头部客户数": 5, "财年实收": 6279815, "上财年同期实收": 3752064, "当月实收": 1118166, "月均GMV": 1482191, "优品数": 2867, "爆品数": 196, "高合作意愿数": 14, "拜访预警数": 8, "财年同比": 67.4}, {"拍档销售": "欧阳杰俊", "总客户数": 13, "超头部客户数": 8, "头部客户数": 5, "财年实收": 5360399, "上财年同期实收": 7009654, "当月实收": 794548, "月均GMV": 1702822, "优品数": 998, "爆品数": 69, "高合作意愿数": 9, "拜访预警数": 7, "财年同比": -23.5}, {"拍档销售": "燕磊", "总客户数": 19, "超头部客户数": 8, "头部客户数": 11, "财年实收": 9726230, "上财年同期实收": 7307605, "当月实收": 1524358, "月均GMV": 2788030, "优品数": 2928, "爆品数": 161, "高合作意愿数": 14, "拜访预警数": 11, "财年同比": 33.1}, {"拍档销售": "狄鹏", "总客户数": 2, "超头部客户数": 2, "头部客户数": 0, "财年实收": 1134757, "上财年同期实收": 638869, "当月实收": 179136, "月均GMV": 241375, "优品数": 197, "爆品数": 5, "高合作意愿数": 2, "拜访预警数": 0, "财年同比": 77.6}, {"拍档销售": "赵舒越", "总客户数": 7, "超头部客户数": 4, "头部客户数": 3, "财年实收": 4097994, "上财年同期实收": 2180590, "当月实收": 683649, "月均GMV": 848496, "优品数": 544, "爆品数": 19, "高合作意愿数": 5, "拜访预警数": 4, "财年同比": 87.9}, {"拍档销售": "高盛强", "总客户数": 22, "超头部客户数": 10, "头部客户数": 12, "财年实收": 50126669, "上财年同期实收": 11598823, "当月实收": 7636475, "月均GMV": 11158345, "优品数": 3438, "爆品数": 238, "高合作意愿数": 16, "拜访预警数": 9, "财年同比": 332.2}], "sales_detail": [{"拍档销售": "刘鑫", "线上信保分层": "头部", "客户数": 6, "财年实收": 1809929, "上财年同期实收": 1862298, "当月实收": 452181, "月均GMV": 433472, "优品数": 1568, "爆品数": 109}, {"拍档销售": "刘鑫", "线上信保分层": "超头部", "客户数": 1, "财年实收": 401418, "上财年同期实收": 507856, "当月实收": 39402, "月均GMV": 118878, "优品数": 8, "爆品数": 0}, {"拍档销售": "李朝燕", "线上信保分层": "头部", "客户数": 2, "财年实收": 761341, "上财年同期实收": 429417, "当月实收": 236959, "月均GMV": 149554, "优品数": 37, "爆品数": 2}, {"拍档销售": "李朝燕", "线上信保分层": "超头部", "客户数": 2, "财年实收": 2551342, "上财年同期实收": 2440670, "当月实收": 612572, "月均GMV": 854065, "优品数": 239, "爆品数": 11}, {"拍档销售": "杨婷婷", "线上信保分层": "头部", "客户数": 5, "财年实收": 1716447, "上财年同期实收": 939456, "当月实收": 296761, "月均GMV": 420420, "优品数": 790, "爆品数": 41}, {"拍档销售": "杨婷婷", "线上信保分层": "超头部", "客户数": 9, "财年实收": 4563368, "上财年同期实收": 2812608, "当月实收": 821405, "月均GMV": 1061771, "优品数": 2077, "爆品数": 155}, {"拍档销售": "欧阳杰俊", "线上信保分层": "头部", "客户数": 5, "财年实收": 1291466, "上财年同期实收": 1078556, "当月实收": 185364, "月均GMV": 329026, "优品数": 533, "爆品数": 37}, {"拍档销售": "欧阳杰俊", "线上信保分层": "超头部", "客户数": 8, "财年实收": 4068933, "上财年同期实收": 5931098, "当月实收": 609184, "月均GMV": 1373796, "优品数": 465, "爆品数": 32}, {"拍档销售": "燕磊", "线上信保分层": "头部", "客户数": 11, "财年实收": 2985054, "上财年同期实收": 3075831, "当月实收": 403459, "月均GMV": 754100, "优品数": 2411, "爆品数": 140}, {"拍档销售": "燕磊", "线上信保分层": "超头部", "客户数": 8, "财年实收": 6741176, "上财年同期实收": 4231774, "当月实收": 1120899, "月均GMV": 2033930, "优品数": 517, "爆品数": 21}, {"拍档销售": "狄鹏", "线上信保分层": "超头部", "客户数": 2, "财年实收": 1134757, "上财年同期实收": 638869, "当月实收": 179136, "月均GMV": 241375, "优品数": 197, "爆品数": 5}, {"拍档销售": "赵舒越", "线上信保分层": "头部", "客户数": 3, "财年实收": 1046586, "上财年同期实收": 949845, "当月实收": 220629, "月均GMV": 216523, "优品数": 200, "爆品数": 5}, {"拍档销售": "赵舒越", "线上信保分层": "超头部", "客户数": 4, "财年实收": 3051408, "上财年同期实收": 1230745, "当月实收": 463020, "月均GMV": 631973, "优品数": 344, "爆品数": 14}, {"拍档销售": "高盛强", "线上信保分层": "头部", "客户数": 12, "财年实收": 3692765, "上财年同期实收": 3853842, "当月实收": 524219, "月均GMV": 905331, "优品数": 1653, "爆品数": 160}, {"拍档销售": "高盛强", "线上信保分层": "超头部", "客户数": 10, "财年实收": 46433904, "上财年同期实收": 7744981, "当月实收": 7112256, "月均GMV": 10253014, "优品数": 1785, "爆品数": 78}], "customers": [{"客户名称": "东莞市晋源祥塑胶五金电子有限公司", "拍档销售": "赵舒越", "线上信保分层": "超头部", "财年实收": 603217, "上财年同期实收": 265374, "当月实收": 28, "近6个月月均GMV": 133058, "优品数": 83, "爆品数": 1, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 3, "一级行业描述": "Home & Garden", "财年同比": 127.3, "拜访风险": "正常"}, {"客户名称": "尚睿科技股份有限公司", "拍档销售": "燕磊", "线上信保分层": "超头部", "财年实收": 748525, "上财年同期实收": 0, "当月实收": 0, "近6个月月均GMV": 561135, "优品数": 0, "爆品数": 0, "合作意愿度": "中", "是否实收预警": "Y", "近一次有效拜访距今天数": 22, "一级行业描述": "Consumer Electronics", "财年同比": 0.0, "拜访风险": "正常"}, {"客户名称": "东莞市迪优门窗科技有限公司", "拍档销售": "高盛强", "线上信保分层": "头部", "财年实收": 394117, "上财年同期实收": 550163, "当月实收": 66428, "近6个月月均GMV": 84357, "优品数": 9, "爆品数": 0, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 26, "一级行业描述": "Construction & Real Estate", "财年同比": -28.4, "拜访风险": "正常"}, {"客户名称": "东莞市焜腾科技有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "头部", "财年实收": 192634, "上财年同期实收": 153670, "当月实收": 1837, "近6个月月均GMV": 54205, "优品数": 332, "爆品数": 33, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 23, "一级行业描述": "Home Appliances", "财年同比": 25.4, "拜访风险": "正常"}, {"客户名称": "东莞敏诺科技有限公司", "拍档销售": "赵舒越", "线上信保分层": "头部", "财年实收": 409645, "上财年同期实收": 275803, "当月实收": 114810, "近6个月月均GMV": 76412, "优品数": 1, "爆品数": 0, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 79, "一级行业描述": "Sports & Entertainment", "财年同比": 48.5, "拜访风险": "高风险"}, {"客户名称": "东莞市纱美特服饰有限公司", "拍档销售": "李朝燕", "线上信保分层": "头部", "财年实收": 401651, "上财年同期实收": 198551, "当月实收": 236159, "近6个月月均GMV": 72168, "优品数": 35, "爆品数": 2, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 64, "一级行业描述": "Apparel & Accessories", "财年同比": 102.3, "拜访风险": "高风险"}, {"客户名称": "东莞市兴风林有机玻璃制品有限公司", "拍档销售": "赵舒越", "线上信保分层": "超头部", "财年实收": 1119753, "上财年同期实收": 220954, "当月实收": 317134, "近6个月月均GMV": 206263, "优品数": 107, "爆品数": 6, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 57, "一级行业描述": "Commercial Equipment & Machinery", "财年同比": 406.8, "拜访风险": "中风险"}, {"客户名称": "东莞市联迪科技有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "财年实收": 446642, "上财年同期实收": 496702, "当月实收": 5585, "近6个月月均GMV": 169629, "优品数": 26, "爆品数": 1, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 52, "一级行业描述": "Consumer Electronics", "财年同比": -10.1, "拜访风险": "中风险"}, {"客户名称": "东莞汇黎服饰有限公司", "拍档销售": "杨婷婷", "线上信保分层": "头部", "财年实收": 225726, "上财年同期实收": 326285, "当月实收": 63679, "近6个月月均GMV": 69058, "优品数": 76, "爆品数": 1, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 24, "一级行业描述": "Apparel & Accessories", "财年同比": -30.8, "拜访风险": "正常"}, {"客户名称": "东莞市宇顺五金有限公司", "拍档销售": "燕磊", "线上信保分层": "超头部", "财年实收": 621790, "上财年同期实收": 506013, "当月实收": 122272, "近6个月月均GMV": 143448, "优品数": 83, "爆品数": 0, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 67, "一级行业描述": "Sports & Entertainment", "财年同比": 22.9, "拜访风险": "高风险"}, {"客户名称": "东莞市新腾东机械设备有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "头部", "财年实收": 259688, "上财年同期实收": 56217, "当月实收": 23107, "近6个月月均GMV": 69262, "优品数": 15, "爆品数": 0, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 24, "一级行业描述": "Industrial Machinery", "财年同比": 361.9, "拜访风险": "正常"}, {"客户名称": "东莞市汇合数据科技有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "财年实收": 433666, "上财年同期实收": 648292, "当月实收": 22319, "近6个月月均GMV": 113393, "优品数": 24, "爆品数": 2, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 24, "一级行业描述": "Packaging & Printing", "财年同比": -33.1, "拜访风险": "正常"}, {"客户名称": "广东顶厨智能家居科技有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "超头部", "财年实收": 1145284, "上财年同期实收": 1032452, "当月实收": 1761, "近6个月月均GMV": 321635, "优品数": 95, "爆品数": 7, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 4, "一级行业描述": "Home Appliances", "财年同比": 10.9, "拜访风险": "正常"}, {"客户名称": "东莞市迪柯精密五金有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "财年实收": 198366, "上财年同期实收": 346951, "当月实收": 9601, "近6个月月均GMV": 50691, "优品数": 44, "爆品数": 0, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 79, "一级行业描述": "Fabrication Services", "财年同比": -42.8, "拜访风险": "高风险"}, {"客户名称": "东莞市贤祥五金电子科技有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "财年实收": 307819, "上财年同期实收": 126523, "当月实收": 53069, "近6个月月均GMV": 67787, "优品数": 186, "爆品数": 9, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 88, "一级行业描述": "Consumer Electronics", "财年同比": 143.3, "拜访风险": "高风险"}, {"客户名称": "东莞市佰腾塑胶五金制品有限公司", "拍档销售": "赵舒越", "线上信保分层": "超头部", "财年实收": 834594, "上财年同期实收": 437742, "当月实收": 45828, "近6个月月均GMV": 163023, "优品数": 82, "爆品数": 6, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 60, "一级行业描述": "Home Appliances", "财年同比": 90.7, "拜访风险": "中风险"}, {"客户名称": "东莞市千加依电子商务有限公司", "拍档销售": "高盛强", "线上信保分层": "头部", "财年实收": 261304, "上财年同期实收": 303344, "当月实收": 30463, "近6个月月均GMV": 60476, "优品数": 115, "爆品数": 5, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 2, "一级行业描述": "Apparel & Accessories", "财年同比": -13.9, "拜访风险": "正常"}, {"客户名称": "东莞市煦昌服饰有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "财年实收": 629048, "上财年同期实收": 492725, "当月实收": 136489, "近6个月月均GMV": 143644, "优品数": 263, "爆品数": 2, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 2, "一级行业描述": "Apparel & Accessories", "财年同比": 27.7, "拜访风险": "正常"}, {"客户名称": "东莞市瑞飞服装有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "财年实收": 279490, "上财年同期实收": 319937, "当月实收": 34360, "近6个月月均GMV": 60715, "优品数": 333, "爆品数": 11, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 95, "一级行业描述": "Apparel & Accessories", "财年同比": -12.6, "拜访风险": "高风险"}, {"客户名称": "东莞市逸宸服饰有限公司", "拍档销售": "高盛强", "线上信保分层": "头部", "财年实收": 225769, "上财年同期实收": 195173, "当月实收": 27503, "近6个月月均GMV": 70892, "优品数": 29, "爆品数": 2, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 16, "一级行业描述": "Apparel & Accessories", "财年同比": 15.7, "拜访风险": "正常"}, {"客户名称": "广东华文新材料科技有限公司", "拍档销售": "燕磊", "线上信保分层": "超头部", "财年实收": 1592692, "上财年同期实收": 990017, "当月实收": 277593, "近6个月月均GMV": 400837, "优品数": 62, "爆品数": 6, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 43, "一级行业描述": "Vehicle Accessories, Electronics & Tools", "财年同比": 60.9, "拜访风险": "中风险"}, {"客户名称": "东莞市顶线电子有限公司", "拍档销售": "刘鑫", "线上信保分层": "头部", "财年实收": 259606, "上财年同期实收": 205572, "当月实收": 55837, "近6个月月均GMV": 54657, "优品数": 3, "爆品数": 0, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 58, "一级行业描述": "Electrical Equipment & Supplies", "财年同比": 26.3, "拜访风险": "中风险"}, {"客户名称": "东莞市永昌美工艺品有限公司", "拍档销售": "燕磊", "线上信保分层": "超头部", "财年实收": 480170, "上财年同期实收": 380848, "当月实收": 42789, "近6个月月均GMV": 112292, "优品数": 1, "爆品数": 0, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 24, "一级行业描述": "Gifts & Crafts", "财年同比": 26.1, "拜访风险": "正常"}, {"客户名称": "东莞市国丰制造有限公司", "拍档销售": "杨婷婷", "线上信保分层": "超头部", "财年实收": 608552, "上财年同期实收": 147636, "当月实收": 61034, "近6个月月均GMV": 106280, "优品数": 54, "爆品数": 0, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 25, "一级行业描述": "Security", "财年同比": 312.2, "拜访风险": "正常"}, {"客户名称": "东莞市晋源祥塑胶五金电子有限公司", "拍档销售": "赵舒越", "线上信保分层": "超头部", "财年实收": 493844, "上财年同期实收": 306675, "当月实收": 100030, "近6个月月均GMV": 129629, "优品数": 72, "爆品数": 1, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 3, "一级行业描述": "Lights & Lighting", "财年同比": 61.0, "拜访风险": "正常"}, {"客户名称": "广东千度科技有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "财年实收": 1064511, "上财年同期实收": 1299883, "当月实收": 2913, "近6个月月均GMV": 304833, "优品数": 132, "爆品数": 5, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 51, "一级行业描述": "Consumer Electronics", "财年同比": -18.1, "拜访风险": "中风险"}, {"客户名称": "东莞市振欣汽车用品有限公司", "拍档销售": "刘鑫", "线上信保分层": "头部", "财年实收": 309280, "上财年同期实收": 472557, "当月实收": 32615, "近6个月月均GMV": 92126, "优品数": 194, "爆品数": 15, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 10, "一级行业描述": "Vehicle Parts & Accessories", "财年同比": -34.6, "拜访风险": "正常"}, {"客户名称": "广东飞彬机械集团有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "财年实收": 964239, "上财年同期实收": 840344, "当月实收": 76428, "近6个月月均GMV": 211429, "优品数": 148, "爆品数": 5, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 106, "一级行业描述": "Industrial Machinery", "财年同比": 14.7, "拜访风险": "高风险"}, {"客户名称": "东莞市同睿服饰有限公司", "拍档销售": "高盛强", "线上信保分层": "头部", "财年实收": 405855, "上财年同期实收": 648500, "当月实收": 61882, "近6个月月均GMV": 99385, "优品数": 190, "爆品数": 9, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 16, "一级行业描述": "Apparel & Accessories", "财年同比": -37.4, "拜访风险": "正常"}, {"客户名称": "深圳市诺芙科技有限公司", "拍档销售": "杨婷婷", "线上信保分层": "超头部", "财年实收": 510226, "上财年同期实收": 360787, "当月实收": 93897, "近6个月月均GMV": 106431, "优品数": 134, "爆品数": 12, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 45, "一级行业描述": "Beauty", "财年同比": 41.4, "拜访风险": "中风险"}, {"客户名称": "东莞市圣锦服饰有限公司", "拍档销售": "高盛强", "线上信保分层": "头部", "财年实收": 370912, "上财年同期实收": 0, "当月实收": 45241, "近6个月月均GMV": 81447, "优品数": 42, "爆品数": 1, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 16, "一级行业描述": "Apparel & Accessories", "财年同比": 0.0, "拜访风险": "正常"}, {"客户名称": "深圳联合触控科技有限公司", "拍档销售": "高盛强", "线上信保分层": "头部", "财年实收": 174949, "上财年同期实收": 403179, "当月实收": 26914, "近6个月月均GMV": 51408, "优品数": 124, "爆品数": 25, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 52, "一级行业描述": "Consumer Electronics", "财年同比": -56.6, "拜访风险": "中风险"}, {"客户名称": "深圳市刘氏太阳能铁锂能源有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "超头部", "财年实收": 175866, "上财年同期实收": 1450021, "当月实收": 20, "近6个月月均GMV": 115946, "优品数": 43, "爆品数": 1, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 3, "一级行业描述": "Renewable Energy", "财年同比": -87.9, "拜访风险": "正常"}, {"客户名称": "广东宏凯光缆设备科技有限公司", "拍档销售": "李朝燕", "线上信保分层": "头部", "财年实收": 359690, "上财年同期实收": 230866, "当月实收": 800, "近6个月月均GMV": 77386, "优品数": 2, "爆品数": 0, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 11, "一级行业描述": "Industrial Machinery", "财年同比": 55.8, "拜访风险": "正常"}, {"客户名称": "东莞市三英手袋有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "财年实收": 321832, "上财年同期实收": 367121, "当月实收": 43769, "近6个月月均GMV": 78756, "优品数": 131, "爆品数": 3, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 15, "一级行业描述": "Luggage, Bags & Cases", "财年同比": -12.3, "拜访风险": "正常"}, {"客户名称": "金顺新材料科技（广东）有限公司", "拍档销售": "李朝燕", "线上信保分层": "超头部", "财年实收": 612682, "上财年同期实收": 305428, "当月实收": 303477, "近6个月月均GMV": 104010, "优品数": 50, "爆品数": 4, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 32, "一级行业描述": "Home & Garden", "财年同比": 100.6, "拜访风险": "中风险"}, {"客户名称": "东莞市盛东碳纤维科技有限公司", "拍档销售": "赵舒越", "线上信保分层": "头部", "财年实收": 378194, "上财年同期实收": 334036, "当月实收": 58750, "近6个月月均GMV": 86203, "优品数": 20, "爆品数": 0, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 22, "一级行业描述": "Vehicle Parts & Accessories", "财年同比": 13.2, "拜访风险": "正常"}, {"客户名称": "金顺新材料科技(广东)有限公司", "拍档销售": "李朝燕", "线上信保分层": "超头部", "财年实收": 1938660, "上财年同期实收": 2135242, "当月实收": 309095, "近6个月月均GMV": 750055, "优品数": 189, "爆品数": 7, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 32, "一级行业描述": "Packaging & Printing", "财年同比": -9.2, "拜访风险": "中风险"}, {"客户名称": "东莞市同恩进出口有限公司", "拍档销售": "刘鑫", "线上信保分层": "超头部", "财年实收": 401418, "上财年同期实收": 507856, "当月实收": 39402, "近6个月月均GMV": 118878, "优品数": 8, "爆品数": 0, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 65, "一级行业描述": "Electrical Equipment & Supplies", "财年同比": -21.0, "拜访风险": "高风险"}, {"客户名称": "东莞市晟熙服饰有限公司", "拍档销售": "杨婷婷", "线上信保分层": "超头部", "财年实收": 614595, "上财年同期实收": 323284, "当月实收": 186071, "近6个月月均GMV": 120609, "优品数": 112, "爆品数": 7, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 186, "一级行业描述": "Apparel & Accessories", "财年同比": 90.1, "拜访风险": "高风险"}, {"客户名称": "东莞市合康服装辅料有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "财年实收": 220778, "上财年同期实收": 149893, "当月实收": 25401, "近6个月月均GMV": 56385, "优品数": 340, "爆品数": 17, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 65, "一级行业描述": "Apparel & Accessories", "财年同比": 47.3, "拜访风险": "高风险"}, {"客户名称": "东莞市茗创优尚电子科技有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "超头部", "财年实收": 552518, "上财年同期实收": 431139, "当月实收": 93267, "近6个月月均GMV": 122172, "优品数": 9, "爆品数": 0, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 57, "一级行业描述": "Home Appliances", "财年同比": 28.2, "拜访风险": "中风险"}, {"客户名称": "东莞市玲之秀服饰有限公司", "拍档销售": "刘鑫", "线上信保分层": "头部", "财年实收": 360945, "上财年同期实收": 422834, "当月实收": 135622, "近6个月月均GMV": 77225, "优品数": 69, "爆品数": 8, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 23, "一级行业描述": "Apparel & Accessories", "财年同比": -14.6, "拜访风险": "正常"}, {"客户名称": "东莞市海翔胶粘制品有限公司", "拍档销售": "杨婷婷", "线上信保分层": "头部", "财年实收": 398816, "上财年同期实收": 114623, "当月实收": 95121, "近6个月月均GMV": 94137, "优品数": 181, "爆品数": 6, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 60, "一级行业描述": "Packaging & Printing", "财年同比": 247.9, "拜访风险": "中风险"}, {"客户名称": "东莞市三英手袋有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "财年实收": 335006, "上财年同期实收": 160594, "当月实收": 62503, "近6个月月均GMV": 91364, "优品数": 12, "爆品数": 0, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 15, "一级行业描述": "Sports & Entertainment", "财年同比": 108.6, "拜访风险": "正常"}, {"客户名称": "东莞市璟裕服饰有限公司", "拍档销售": "高盛强", "线上信保分层": "头部", "财年实收": 194825, "上财年同期实收": 338308, "当月实收": 4860, "近6个月月均GMV": 52568, "优品数": 10, "爆品数": 3, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 3, "一级行业描述": "Apparel & Accessories", "财年同比": -42.4, "拜访风险": "正常"}, {"客户名称": "东莞晓龙包装实业有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "财年实收": 253297, "上财年同期实收": 177658, "当月实收": 19358, "近6个月月均GMV": 71549, "优品数": 179, "爆品数": 4, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 23, "一级行业描述": "Packaging & Printing", "财年同比": 42.6, "拜访风险": "正常"}, {"客户名称": "广东绿达新能源有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "财年实收": 39096653, "上财年同期实收": 43400, "当月实收": 6109411, "近6个月月均GMV": 8267286, "优品数": 83, "爆品数": 8, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 9, "一级行业描述": "Renewable Energy", "财年同比": 89984.5, "拜访风险": "正常"}, {"客户名称": "东莞市原创风服饰有限公司", "拍档销售": "杨婷婷", "线上信保分层": "头部", "财年实收": 411122, "上财年同期实收": 243907, "当月实收": 77594, "近6个月月均GMV": 95180, "优品数": 129, "爆品数": 5, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 24, "一级行业描述": "Apparel & Accessories", "财年同比": 68.6, "拜访风险": "正常"}, {"客户名称": "东莞市维丽纳首饰智造有限公司", "拍档销售": "高盛强", "线上信保分层": "头部", "财年实收": 285025, "上财年同期实收": 357574, "当月实收": 42122, "近6个月月均GMV": 74495, "优品数": 70, "爆品数": 1, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 26, "一级行业描述": "Jewelry, Eyewear, Watches & Accessories", "财年同比": -20.3, "拜访风险": "正常"}, {"客户名称": "东莞市玉煌电子科技有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "头部", "财年实收": 247443, "上财年同期实收": 248738, "当月实收": 28441, "近6个月月均GMV": 55464, "优品数": 59, "爆品数": 0, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 25, "一级行业描述": "Tools & Hardware", "财年同比": -0.5, "拜访风险": "正常"}, {"客户名称": "东莞市永奇玩具科技有限公司", "拍档销售": "赵舒越", "线上信保分层": "头部", "财年实收": 258747, "上财年同期实收": 340006, "当月实收": 47069, "近6个月月均GMV": 53908, "优品数": 179, "爆品数": 5, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 36, "一级行业描述": "Mother, Kids & Toys", "财年同比": -23.9, "拜访风险": "中风险"}, {"客户名称": "深圳瑞奇包装用品有限公司", "拍档销售": "燕磊", "线上信保分层": "超头部", "财年实收": 1419773, "上财年同期实收": 1473934, "当月实收": 372640, "近6个月月均GMV": 353278, "优品数": 38, "爆品数": 1, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 99, "一级行业描述": "Packaging & Printing", "财年同比": -3.7, "拜访风险": "高风险"}, {"客户名称": "东莞市欢欢能源科技有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "财年实收": 311598, "上财年同期实收": 285460, "当月实收": 41387, "近6个月月均GMV": 73828, "优品数": 191, "爆品数": 28, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 43, "一级行业描述": "Renewable Energy", "财年同比": 9.2, "拜访风险": "中风险"}, {"客户名称": "东莞市沅达世纪照明科技有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "头部", "财年实收": 307745, "上财年同期实收": 289656, "当月实收": 86447, "近6个月月均GMV": 86710, "优品数": 110, "爆品数": 4, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 52, "一级行业描述": "Vehicle Parts & Accessories", "财年同比": 6.2, "拜访风险": "中风险"}, {"客户名称": "东莞市鑫盛服装有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "财年实收": 601377, "上财年同期实收": 530362, "当月实收": 115546, "近6个月月均GMV": 148280, "优品数": 461, "爆品数": 24, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 3, "一级行业描述": "Apparel & Accessories", "财年同比": 13.4, "拜访风险": "正常"}, {"客户名称": "东莞市恒越实业有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "超头部", "财年实收": 411567, "上财年同期实收": 1455876, "当月实收": 1309, "近6个月月均GMV": 165142, "优品数": 26, "爆品数": 0, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 36, "一级行业描述": "Pet Supplies", "财年同比": -71.7, "拜访风险": "中风险"}, {"客户名称": "广东格瑞斯精密五金科技有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "超头部", "财年实收": 95, "上财年同期实收": 0, "当月实收": 49, "近6个月月均GMV": 102765, "优品数": 6, "爆品数": 1, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 1, "一级行业描述": "Furniture", "财年同比": 0.0, "拜访风险": "正常"}, {"客户名称": "东莞市国丰制造有限公司", "拍档销售": "杨婷婷", "线上信保分层": "超头部", "财年实收": 296887, "上财年同期实收": 287051, "当月实收": 76974, "近6个月月均GMV": 122940, "优品数": 184, "爆品数": 7, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 25, "一级行业描述": "Metals & Alloys", "财年同比": 3.4, "拜访风险": "正常"}, {"客户名称": "东莞市同恩进出口有限公司", "拍档销售": "刘鑫", "线上信保分层": "头部", "财年实收": 383079, "上财年同期实收": 380493, "当月实收": 162933, "近6个月月均GMV": 92132, "优品数": 112, "爆品数": 2, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 65, "一级行业描述": "Agriculture", "财年同比": 0.7, "拜访风险": "高风险"}, {"客户名称": "东莞市班墨机械有限公司", "拍档销售": "刘鑫", "线上信保分层": "头部", "财年实收": 265226, "上财年同期实收": 201740, "当月实收": 20866, "近6个月月均GMV": 65194, "优品数": 659, "爆品数": 72, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 1, "一级行业描述": "Industrial Machinery", "财年同比": 31.5, "拜访风险": "正常"}, {"客户名称": "广东吉盛科实业有限公司", "拍档销售": "杨婷婷", "线上信保分层": "头部", "财年实收": 387581, "上财年同期实收": 137082, "当月实收": 60269, "近6个月月均GMV": 83022, "优品数": 75, "爆品数": 1, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 26, "一级行业描述": "Lights & Lighting", "财年同比": 182.7, "拜访风险": "正常"}, {"客户名称": "东莞市日东智能装备有限公司", "拍档销售": "杨婷婷", "线上信保分层": "超头部", "财年实收": 478679, "上财年同期实收": 150088, "当月实收": 112717, "近6个月月均GMV": 107557, "优品数": 48, "爆品数": 0, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 39, "一级行业描述": "Industrial Machinery", "财年同比": 218.9, "拜访风险": "中风险"}, {"客户名称": "东莞市益卡环保科技有限公司", "拍档销售": "高盛强", "线上信保分层": "头部", "财年实收": 318385, "上财年同期实收": 356131, "当月实收": 61206, "近6个月月均GMV": 74941, "优品数": 381, "爆品数": 28, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 93, "一级行业描述": "Packaging & Printing", "财年同比": -10.6, "拜访风险": "高风险"}, {"客户名称": "广东逸动生活服饰科技有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "财年实收": 1453275, "上财年同期实收": 1980753, "当月实收": 326372, "近6个月月均GMV": 365827, "优品数": 374, "爆品数": 17, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 16, "一级行业描述": "Apparel & Accessories", "财年同比": -26.6, "拜访风险": "正常"}, {"客户名称": "东莞市华亿汽车配件有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "财年实收": 281215, "上财年同期实收": 244504, "当月实收": 51309, "近6个月月均GMV": 66702, "优品数": 181, "爆品数": 18, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 4, "一级行业描述": "Vehicle Parts & Accessories", "财年同比": 15.0, "拜访风险": "正常"}, {"客户名称": "东莞汐兮皮革制品有限公司", "拍档销售": "杨婷婷", "线上信保分层": "头部", "财年实收": 293202, "上财年同期实收": 117559, "当月实收": 98, "近6个月月均GMV": 79023, "优品数": 329, "爆品数": 28, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 65, "一级行业描述": "Home & Garden", "财年同比": 149.4, "拜访风险": "高风险"}, {"客户名称": "东莞市益卡包装制品有限公司", "拍档销售": "高盛强", "线上信保分层": "头部", "财年实收": 386158, "上财年同期实收": 412092, "当月实收": 67996, "近6个月月均GMV": 85287, "优品数": 366, "爆品数": 27, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 93, "一级行业描述": "Packaging & Printing", "财年同比": -6.3, "拜访风险": "高风险"}, {"客户名称": "东莞市蓝彩服装有限公司", "拍档销售": "狄鹏", "线上信保分层": "超头部", "财年实收": 572171, "上财年同期实收": 463931, "当月实收": 89796, "近6个月月均GMV": 118221, "优品数": 145, "爆品数": 5, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 24, "一级行业描述": "Apparel & Accessories", "财年同比": 23.3, "拜访风险": "正常"}, {"客户名称": "东莞市大美实业有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "超头部", "财年实收": 200949, "上财年同期实收": 532185, "当月实收": 80340, "近6个月月均GMV": 100427, "优品数": 12, "爆品数": 0, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 44, "一级行业描述": "Home & Garden", "财年同比": -62.2, "拜访风险": "中风险"}, {"客户名称": "东莞市好印象实业有限公司", "拍档销售": "杨婷婷", "线上信保分层": "超头部", "财年实收": 465642, "上财年同期实收": 487739, "当月实收": 707, "近6个月月均GMV": 112356, "优品数": 68, "爆品数": 4, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 38, "一级行业描述": "Home & Garden", "财年同比": -4.5, "拜访风险": "中风险"}, {"客户名称": "东莞市联迪科技有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "财年实收": 451792, "上财年同期实收": 161299, "当月实收": 5274, "近6个月月均GMV": 122340, "优品数": 42, "爆品数": 5, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 52, "一级行业描述": "Commercial Equipment & Machinery", "财年同比": 180.1, "拜访风险": "中风险"}, {"客户名称": "东莞金保马科技有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "财年实收": 244587, "上财年同期实收": 309756, "当月实收": 23518, "近6个月月均GMV": 78140, "优品数": 363, "爆品数": 10, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 3, "一级行业描述": "Home & Garden", "财年同比": -21.0, "拜访风险": "正常"}, {"客户名称": "东莞市瑞飞服装有限公司", "拍档销售": "燕磊", "线上信保分层": "超头部", "财年实收": 739782, "上财年同期实收": 471345, "当月实收": 56760, "近6个月月均GMV": 174831, "优品数": 223, "爆品数": 10, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 95, "一级行业描述": "Apparel & Accessories", "财年同比": 57.0, "拜访风险": "高风险"}, {"客户名称": "东莞市万泽家居用品有限公司", "拍档销售": "燕磊", "线上信保分层": "超头部", "财年实收": 436765, "上财年同期实收": 159273, "当月实收": 100000, "近6个月月均GMV": 114397, "优品数": 0, "爆品数": 0, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 38, "一级行业描述": "Home & Garden", "财年同比": 174.2, "拜访风险": "中风险"}, {"客户名称": "东莞市永方电子科技有限公司", "拍档销售": "燕磊", "线上信保分层": "超头部", "财年实收": 701679, "上财年同期实收": 250344, "当月实收": 148845, "近6个月月均GMV": 173712, "优品数": 110, "爆品数": 4, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 22, "一级行业描述": "Consumer Electronics", "财年同比": 180.3, "拜访风险": "正常"}, {"客户名称": "东莞市中达电子科技有限公司", "拍档销售": "杨婷婷", "线上信保分层": "超头部", "财年实收": 534161, "上财年同期实收": 547518, "当月实收": 79920, "近6个月月均GMV": 116620, "优品数": 387, "爆品数": 45, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 35, "一级行业描述": "Sports & Entertainment", "财年同比": -2.4, "拜访风险": "中风险"}, {"客户名称": "东莞市巧手服饰有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "财年实收": 231066, "上财年同期实收": 587434, "当月实收": 39184, "近6个月月均GMV": 58183, "优品数": 451, "爆品数": 40, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 94, "一级行业描述": "Apparel & Accessories", "财年同比": -60.7, "拜访风险": "高风险"}, {"客户名称": "东莞市信诺皮革有限公司", "拍档销售": "杨婷婷", "线上信保分层": "超头部", "财年实收": 573187, "上财年同期实收": 149934, "当月实收": 74859, "近6个月月均GMV": 152238, "优品数": 1005, "爆品数": 79, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 54, "一级行业描述": "Fabric & Textile Raw Material", "财年同比": 282.3, "拜访风险": "中风险"}, {"客户名称": "东莞市联迪科技有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "财年实收": 1292701, "上财年同期实收": 1251221, "当月实收": 311919, "近6个月月均GMV": 406353, "优品数": 232, "爆品数": 9, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 52, "一级行业描述": "Consumer Electronics", "财年同比": 3.3, "拜访风险": "中风险"}, {"客户名称": "东莞市零点潮流服饰有限公司", "拍档销售": "高盛强", "线上信保分层": "头部", "财年实收": 283460, "上财年同期实收": 0, "当月实收": 40622, "近6个月月均GMV": 71085, "优品数": 24, "爆品数": 0, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 25, "一级行业描述": "Apparel & Accessories", "财年同比": 0.0, "拜访风险": "正常"}, {"客户名称": "广东创点智能科技有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "头部", "财年实收": 283956, "上财年同期实收": 330275, "当月实收": 45532, "近6个月月均GMV": 63385, "优品数": 17, "爆品数": 0, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 99, "一级行业描述": "Construction & Real Estate", "财年同比": -14.0, "拜访风险": "高风险"}, {"客户名称": "东莞市星灿服饰有限公司", "拍档销售": "高盛强", "线上信保分层": "头部", "财年实收": 392006, "上财年同期实收": 289378, "当月实收": 48982, "近6个月月均GMV": 98990, "优品数": 293, "爆品数": 59, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 64, "一级行业描述": "Apparel & Accessories", "财年同比": 35.5, "拜访风险": "高风险"}, {"客户名称": "广东加一佳服装有限公司", "拍档销售": "刘鑫", "线上信保分层": "头部", "财年实收": 231793, "上财年同期实收": 179102, "当月实收": 44308, "近6个月月均GMV": 52138, "优品数": 531, "爆品数": 12, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 94, "一级行业描述": "Apparel & Accessories", "财年同比": 29.4, "拜访风险": "高风险"}, {"客户名称": "东莞市莞益灯饰有限公司", "拍档销售": "狄鹏", "线上信保分层": "超头部", "财年实收": 562586, "上财年同期实收": 174938, "当月实收": 89340, "近6个月月均GMV": 123154, "优品数": 52, "爆品数": 0, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 25, "一级行业描述": "Lights & Lighting", "财年同比": 221.6, "拜访风险": "正常"}, {"客户名称": "江西省胜明电子科技有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "超头部", "财年实收": 1082223, "上财年同期实收": 434347, "当月实收": 376093, "近6个月月均GMV": 334656, "优品数": 116, "爆品数": 6, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 99, "一级行业描述": "Home Appliances", "财年同比": 149.2, "拜访风险": "高风险"}, {"客户名称": "深圳市豪盛达包装制品有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "超头部", "财年实收": 500431, "上财年同期实收": 595078, "当月实收": 56345, "近6个月月均GMV": 111053, "优品数": 158, "爆品数": 17, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 31, "一级行业描述": "Packaging & Printing", "财年同比": -15.9, "拜访风险": "中风险"}, {"客户名称": "广东吉盛科实业有限公司", "拍档销售": "杨婷婷", "线上信保分层": "超头部", "财年实收": 481439, "上财年同期实收": 358571, "当月实收": 135226, "近6个月月均GMV": 116740, "优品数": 85, "爆品数": 1, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 26, "一级行业描述": "Lights & Lighting", "财年同比": 34.3, "拜访风险": "正常"}]}
-;
+const RAW_DATA = {"sales_summary": [{"拍档销售": "刘鑫", "总客户数": 7, "超头部客户数": 1, "头部客户数": 6, "财年实收": 2256350, "上财年同期实收": 2409614, "当月实收": 536583, "当月目标": 288041, "月均GMV": 559744, "优品数": 1556, "爆品数": 113, "拜访预警数": 4, "高合作意愿数": 6, "财年同比": -6.4, "当月完成率": 186.3}, {"拍档销售": "李朝燕", "总客户数": 4, "超头部客户数": 2, "头部客户数": 2, "财年实收": 3342540, "上财年同期实收": 2870147, "当月实收": 879389, "当月目标": 573789, "月均GMV": 1041884, "优品数": 285, "爆品数": 13, "拜访预警数": 1, "高合作意愿数": 3, "财年同比": 16.5, "当月完成率": 153.3}, {"拍档销售": "杨婷婷", "总客户数": 14, "超头部客户数": 9, "头部客户数": 5, "财年实收": 6413990, "上财年同期实收": 3813849, "当月实收": 1252342, "当月目标": 582491, "月均GMV": 1498960, "优品数": 2742, "爆品数": 181, "拜访预警数": 8, "高合作意愿数": 14, "财年同比": 68.2, "当月完成率": 215.0}, {"拍档销售": "欧阳杰俊", "总客户数": 13, "超头部客户数": 8, "头部客户数": 5, "财年实收": 5506449, "上财年同期实收": 7316240, "当月实收": 940598, "当月目标": 2025587, "月均GMV": 1726988, "优品数": 991, "爆品数": 70, "拜访预警数": 6, "高合作意愿数": 9, "财年同比": -24.7, "当月完成率": 46.4}, {"拍档销售": "燕磊", "总客户数": 19, "超头部客户数": 8, "头部客户数": 11, "财年实收": 10295236, "上财年同期实收": 8000343, "当月实收": 2093364, "当月目标": 1935996, "月均GMV": 2882347, "优品数": 2933, "爆品数": 162, "拜访预警数": 10, "高合作意愿数": 14, "财年同比": 28.7, "当月完成率": 108.1}, {"拍档销售": "狄鹏", "总客户数": 2, "超头部客户数": 2, "头部客户数": 0, "财年实收": 1153979, "上财年同期实收": 640217, "当月实收": 198358, "当月目标": 107485, "月均GMV": 244504, "优品数": 192, "爆品数": 6, "拜访预警数": 0, "高合作意愿数": 2, "财年同比": 80.2, "当月完成率": 184.5}, {"拍档销售": "赵舒越", "总客户数": 8, "超头部客户数": 4, "头部客户数": 4, "财年实收": 4433654, "上财年同期实收": 2469088, "当月实收": 858070, "当月目标": 570485, "月均GMV": 908676, "优品数": 612, "爆品数": 25, "拜访预警数": 5, "高合作意愿数": 6, "财年同比": 79.6, "当月完成率": 150.4}, {"拍档销售": "高盛强", "总客户数": 21, "超头部客户数": 11, "头部客户数": 10, "财年实收": 51850520, "上财年同期实收": 11695550, "当月实收": 9550290, "当月目标": 2696138, "月均GMV": 11414175, "优品数": 3506, "爆品数": 238, "拜访预警数": 9, "高合作意愿数": 16, "财年同比": 343.3, "当月完成率": 354.2}], "sales_detail": [{"拍档销售": "刘鑫", "线上信保分层": "头部", "客户数": 6, "财年实收": 1854932, "上财年同期实收": 1901598, "当月实收": 497181, "当月目标": 287880, "月均GMV": 440866, "优品数": 1547, "爆品数": 113, "当月完成率": 172.7}, {"拍档销售": "刘鑫", "线上信保分层": "超头部", "客户数": 1, "财年实收": 401418, "上财年同期实收": 508016, "当月实收": 39402, "当月目标": 161, "月均GMV": 118878, "优品数": 9, "爆品数": 0, "当月完成率": 24473.3}, {"拍档销售": "李朝燕", "线上信保分层": "头部", "客户数": 2, "财年实收": 783279, "上财年同期实收": 429417, "当月实收": 258898, "当月目标": 43469, "月均GMV": 153210, "优品数": 37, "爆品数": 2, "当月完成率": 595.6}, {"拍档销售": "李朝燕", "线上信保分层": "超头部", "客户数": 2, "财年实收": 2559261, "上财年同期实收": 2440730, "当月实收": 620491, "当月目标": 530320, "月均GMV": 888674, "优品数": 248, "爆品数": 11, "当月完成率": 117.0}, {"拍档销售": "杨婷婷", "线上信保分层": "头部", "客户数": 5, "财年实收": 1791747, "上财年同期实收": 955420, "当月实收": 372061, "当月目标": 259814, "月均GMV": 430745, "优品数": 760, "爆品数": 42, "当月完成率": 143.2}, {"拍档销售": "杨婷婷", "线上信保分层": "超头部", "客户数": 9, "财年实收": 4622243, "上财年同期实收": 2858429, "当月实收": 880281, "当月目标": 322677, "月均GMV": 1068215, "优品数": 1982, "爆品数": 139, "当月完成率": 272.8}, {"拍档销售": "欧阳杰俊", "线上信保分层": "头部", "客户数": 5, "财年实收": 1346702, "上财年同期实收": 1092270, "当月实收": 240600, "当月目标": 304893, "月均GMV": 338201, "优品数": 523, "爆品数": 38, "当月完成率": 78.9}, {"拍档销售": "欧阳杰俊", "线上信保分层": "超头部", "客户数": 8, "财年实收": 4159747, "上财年同期实收": 6223970, "当月实收": 699998, "当月目标": 1720694, "月均GMV": 1388787, "优品数": 468, "爆品数": 32, "当月完成率": 40.7}, {"拍档销售": "燕磊", "线上信保分层": "头部", "客户数": 11, "财年实收": 3063781, "上财年同期实收": 3113811, "当月实收": 482186, "当月目标": 591631, "月均GMV": 768034, "优品数": 2407, "爆品数": 142, "当月完成率": 81.5}, {"拍档销售": "燕磊", "线上信保分层": "超头部", "客户数": 8, "财年实收": 7231455, "上财年同期实收": 4886532, "当月实收": 1611178, "当月目标": 1344365, "月均GMV": 2114313, "优品数": 526, "爆品数": 20, "当月完成率": 119.8}, {"拍档销售": "狄鹏", "线上信保分层": "超头部", "客户数": 2, "财年实收": 1153979, "上财年同期实收": 640217, "当月实收": 198358, "当月目标": 107485, "月均GMV": 244504, "优品数": 192, "爆品数": 6, "当月完成率": 184.5}, {"拍档销售": "赵舒越", "线上信保分层": "头部", "客户数": 4, "财年实收": 1327335, "上财年同期实收": 1088810, "当月实收": 340139, "当月目标": 266122, "月均GMV": 273825, "优品数": 268, "爆品数": 11, "当月完成率": 127.8}, {"拍档销售": "赵舒越", "线上信保分层": "超头部", "客户数": 4, "财年实收": 3106319, "上财年同期实收": 1380278, "当月实收": 517931, "当月目标": 304363, "月均GMV": 634851, "优品数": 344, "爆品数": 14, "当月完成率": 170.2}, {"拍档销售": "高盛强", "线上信保分层": "头部", "客户数": 10, "财年实收": 3227467, "上财年同期实收": 3140687, "当月实收": 592858, "当月目标": 762589, "月均GMV": 776188, "优品数": 1475, "爆品数": 150, "当月完成率": 77.7}, {"拍档销售": "高盛强", "线上信保分层": "超头部", "客户数": 11, "财年实收": 48623053, "上财年同期实收": 8554863, "当月实收": 8957432, "当月目标": 1933549, "月均GMV": 10637987, "优品数": 2031, "爆品数": 88, "当月完成率": 463.3}], "customers": [{"客户名称": "广东格瑞斯精密五金科技有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "超头部", "财年实收": 95, "上财年同期实收": 0, "财年同比": 0.0, "当月实收": 49, "目标": 0, "当月完成率": 0.0, "当月同比": 0.0, "近6个月月均GMV": 102765, "优品数": 7, "爆品数": 1, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 4, "拜访风险": "正常", "一级行业描述": "Furniture", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市莞益灯饰有限公司", "拍档销售": "狄鹏", "线上信保分层": "超头部", "财年实收": 579649, "上财年同期实收": 174938, "财年同比": 231.3, "当月实收": 106403, "目标": 25341, "当月完成率": 419.9, "当月同比": 319.9, "近6个月月均GMV": 125998, "优品数": 53, "爆品数": 0, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 28, "拜访风险": "正常", "一级行业描述": "Lights & Lighting", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市焜腾科技有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "头部", "财年实收": 192651, "上财年同期实收": 163209, "财年同比": 18.0, "当月实收": 1854, "目标": 46734, "当月完成率": 4.0, "当月同比": -96.0, "近6个月月均GMV": 54208, "优品数": 319, "爆品数": 33, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 26, "拜访风险": "正常", "一级行业描述": "Home Appliances", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市宇顺五金有限公司", "拍档销售": "燕磊", "线上信保分层": "超头部", "财年实收": 634295, "上财年同期实收": 508603, "财年同比": 24.7, "当月实收": 134777, "目标": 166296, "当月完成率": 81.0, "当月同比": -19.0, "近6个月月均GMV": 145532, "优品数": 83, "爆品数": 0, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 70, "拜访风险": "高风险", "一级行业描述": "Sports & Entertainment", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市玉煌电子科技有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "头部", "财年实收": 254050, "上财年同期实收": 250124, "财年同比": 1.6, "当月实收": 35048, "目标": 85637, "当月完成率": 40.9, "当月同比": -59.1, "近6个月月均GMV": 56535, "优品数": 60, "爆品数": 0, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 28, "拜访风险": "正常", "一级行业描述": "Tools & Hardware", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "深圳瑞奇包装用品有限公司", "拍档销售": "燕磊", "线上信保分层": "超头部", "财年实收": 1495575, "上财年同期实收": 1513907, "财年同比": -1.2, "当月实收": 448442, "目标": 337222, "当月完成率": 133.0, "当月同比": 33.0, "近6个月月均GMV": 364469, "优品数": 40, "爆品数": 0, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 102, "拜访风险": "高风险", "一级行业描述": "Packaging & Printing", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市顶线电子有限公司", "拍档销售": "刘鑫", "线上信保分层": "头部", "财年实收": 259606, "上财年同期实收": 205572, "财年同比": 26.3, "当月实收": 55837, "目标": 0, "当月完成率": 0.0, "当月同比": 0.0, "近6个月月均GMV": 54657, "优品数": 3, "爆品数": 0, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 61, "拜访风险": "高风险", "一级行业描述": "Electrical Equipment & Supplies", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市三英手袋有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "财年实收": 327062, "上财年同期实收": 367371, "财年同比": -11.0, "当月实收": 48999, "目标": 74586, "当月完成率": 65.7, "当月同比": -34.3, "近6个月月均GMV": 79627, "优品数": 125, "爆品数": 3, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 18, "拜访风险": "正常", "一级行业描述": "Luggage, Bags & Cases", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "深圳市刘氏太阳能铁锂能源有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "超头部", "财年实收": 211866, "上财年同期实收": 1452481, "财年同比": -85.4, "当月实收": 36020, "目标": 501220, "当月完成率": 7.2, "当月同比": -92.8, "近6个月月均GMV": 121946, "优品数": 43, "爆品数": 1, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 6, "拜访风险": "正常", "一级行业描述": "Renewable Energy", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞金保马科技有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "财年实收": 272349, "上财年同期实收": 316536, "财年同比": -14.0, "当月实收": 51280, "目标": 78194, "当月完成率": 65.6, "当月同比": -34.4, "近6个月月均GMV": 82557, "优品数": 368, "爆品数": 11, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 6, "拜访风险": "正常", "一级行业描述": "Home & Garden", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞汇黎服饰有限公司", "拍档销售": "杨婷婷", "线上信保分层": "头部", "财年实收": 231354, "上财年同期实收": 328748, "财年同比": -29.6, "当月实收": 69307, "目标": 21656, "当月完成率": 320.0, "当月同比": 220.0, "近6个月月均GMV": 69985, "优品数": 78, "爆品数": 2, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 27, "拜访风险": "正常", "一级行业描述": "Apparel & Accessories", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "广东飞彬机械集团有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "财年实收": 968742, "上财年同期实收": 862315, "财年同比": 12.3, "当月实收": 80931, "目标": 77861, "当月完成率": 103.9, "当月同比": 3.9, "近6个月月均GMV": 212180, "优品数": 154, "爆品数": 5, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 109, "拜访风险": "高风险", "一级行业描述": "Industrial Machinery", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "广东华文新材料科技有限公司", "拍档销售": "燕磊", "线上信保分层": "超头部", "财年实收": 1811249, "上财年同期实收": 1567208, "财年同比": 15.6, "当月实收": 496150, "目标": 577762, "当月完成率": 85.9, "当月同比": -14.1, "近6个月月均GMV": 437328, "优品数": 66, "爆品数": 6, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 0, "拜访风险": "正常", "一级行业描述": "Vehicle Accessories, Electronics & Tools", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "广东加一佳服装有限公司", "拍档销售": "刘鑫", "线上信保分层": "头部", "财年实收": 242463, "上财年同期实收": 182347, "财年同比": 33.0, "当月实收": 54978, "目标": 43627, "当月完成率": 126.0, "当月同比": 26.0, "近6个月月均GMV": 53850, "优品数": 537, "爆品数": 14, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 97, "拜访风险": "高风险", "一级行业描述": "Apparel & Accessories", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市永昌美工艺品有限公司", "拍档销售": "燕磊", "线上信保分层": "超头部", "财年实收": 480170, "上财年同期实收": 409329, "财年同比": 17.3, "当月实收": 42789, "目标": 29051, "当月完成率": 147.3, "当月同比": 47.3, "近6个月月均GMV": 112292, "优品数": 1, "爆品数": 0, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 27, "拜访风险": "正常", "一级行业描述": "Gifts & Crafts", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市巧手服饰有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "财年实收": 236616, "上财年同期实收": 590606, "财年同比": -59.9, "当月实收": 44734, "目标": 147692, "当月完成率": 30.3, "当月同比": -69.7, "近6个月月均GMV": 59262, "优品数": 455, "爆品数": 42, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 97, "拜访风险": "高风险", "一级行业描述": "Apparel & Accessories", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "广东千度科技有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "财年实收": 1064969, "上财年同期实收": 1390557, "财年同比": -23.4, "当月实收": 3370, "目标": 329897, "当月完成率": 1.0, "当月同比": -99.0, "近6个月月均GMV": 304909, "优品数": 126, "爆品数": 4, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 54, "拜访风险": "中风险", "一级行业描述": "Consumer Electronics", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "金顺新材料科技(广东)有限公司", "拍档销售": "李朝燕", "线上信保分层": "超头部", "财年实收": 1946579, "上财年同期实收": 2135302, "财年同比": -8.8, "当月实收": 317014, "目标": 529510, "当月完成率": 59.9, "当月同比": -40.1, "近6个月月均GMV": 784664, "优品数": 198, "爆品数": 7, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 2, "拜访风险": "正常", "一级行业描述": "Packaging & Printing", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市瑞飞服装有限公司", "拍档销售": "燕磊", "线上信保分层": "超头部", "财年实收": 752147, "上财年同期实收": 477773, "财年同比": 57.4, "当月实收": 69125, "目标": 65494, "当月完成率": 105.5, "当月同比": 5.5, "近6个月月均GMV": 176940, "优品数": 228, "爆品数": 10, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 98, "拜访风险": "高风险", "一级行业描述": "Apparel & Accessories", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市永奇玩具科技有限公司", "拍档销售": "赵舒越", "线上信保分层": "头部", "财年实收": 263171, "上财年同期实收": 361743, "财年同比": -27.2, "当月实收": 51493, "目标": 82742, "当月完成率": 62.2, "当月同比": -37.8, "近6个月月均GMV": 54908, "优品数": 181, "爆品数": 5, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 39, "拜访风险": "中风险", "一级行业描述": "Mother, Kids & Toys", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市原创风服饰有限公司", "拍档销售": "杨婷婷", "线上信保分层": "头部", "财年实收": 425154, "上财年同期实收": 253692, "财年同比": 67.6, "当月实收": 91626, "目标": 66314, "当月完成率": 138.2, "当月同比": 38.2, "近6个月月均GMV": 97518, "优品数": 130, "爆品数": 6, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 27, "拜访风险": "正常", "一级行业描述": "Apparel & Accessories", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "深圳联合触控科技有限公司", "拍档销售": "高盛强", "线上信保分层": "头部", "财年实收": 175453, "上财年同期实收": 403291, "财年同比": -56.5, "当月实收": 27418, "目标": 151800, "当月完成率": 18.1, "当月同比": -81.9, "近6个月月均GMV": 51492, "优品数": 130, "爆品数": 26, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 55, "拜访风险": "中风险", "一级行业描述": "Consumer Electronics", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "广东逸动生活服饰科技有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "财年实收": 1471706, "上财年同期实收": 2001469, "财年同比": -26.5, "当月实收": 344803, "目标": 485022, "当月完成率": 71.1, "当月同比": -28.9, "近6个月月均GMV": 369035, "优品数": 386, "爆品数": 18, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 19, "拜访风险": "正常", "一级行业描述": "Apparel & Accessories", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市汇合数据科技有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "财年实收": 438241, "上财年同期实收": 649953, "财年同比": -32.6, "当月实收": 26894, "目标": 117235, "当月完成率": 22.9, "当月同比": -77.1, "近6个月月均GMV": 114156, "优品数": 23, "爆品数": 2, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 0, "拜访风险": "正常", "一级行业描述": "Packaging & Printing", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市迪柯精密五金有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "财年实收": 200308, "上财年同期实收": 348130, "财年同比": -42.5, "当月实收": 11543, "目标": 41722, "当月完成率": 27.7, "当月同比": -72.3, "近6个月月均GMV": 51015, "优品数": 44, "爆品数": 0, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 82, "拜访风险": "高风险", "一级行业描述": "Fabrication Services", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "广东宏凯光缆设备科技有限公司", "拍档销售": "李朝燕", "线上信保分层": "头部", "财年实收": 359690, "上财年同期实收": 230866, "财年同比": 55.8, "当月实收": 800, "目标": 1078, "当月完成率": 74.2, "当月同比": -25.8, "近6个月月均GMV": 77386, "优品数": 2, "爆品数": 0, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 14, "拜访风险": "正常", "一级行业描述": "Industrial Machinery", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市三英手袋有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "财年实收": 335006, "上财年同期实收": 160594, "财年同比": 108.6, "当月实收": 62503, "目标": 60525, "当月完成率": 103.3, "当月同比": 3.3, "近6个月月均GMV": 91364, "优品数": 10, "爆品数": 0, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 18, "拜访风险": "正常", "一级行业描述": "Sports & Entertainment", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市联迪科技有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "财年实收": 453633, "上财年同期实收": 161299, "财年同比": 181.2, "当月实收": 7115, "目标": 79266, "当月完成率": 9.0, "当月同比": -91.0, "近6个月月均GMV": 122647, "优品数": 44, "爆品数": 5, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 55, "拜访风险": "中风险", "一级行业描述": "Commercial Equipment & Machinery", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市欢欢能源科技有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "财年实收": 315544, "上财年同期实收": 287018, "财年同比": 9.9, "当月实收": 45333, "目标": 20742, "当月完成率": 218.6, "当月同比": 118.6, "近6个月月均GMV": 74486, "优品数": 189, "爆品数": 28, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 46, "拜访风险": "中风险", "一级行业描述": "Renewable Energy", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市国丰制造有限公司", "拍档销售": "杨婷婷", "线上信保分层": "超头部", "财年实收": 608552, "上财年同期实收": 147646, "财年同比": 312.2, "当月实收": 61034, "目标": 38793, "当月完成率": 157.3, "当月同比": 57.3, "近6个月月均GMV": 106280, "优品数": 50, "爆品数": 0, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 28, "拜访风险": "正常", "一级行业描述": "Security", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市华亿汽车配件有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "财年实收": 287564, "上财年同期实收": 249981, "财年同比": 15.0, "当月实收": 57658, "目标": 40500, "当月完成率": 142.4, "当月同比": 42.4, "近6个月月均GMV": 67650, "优品数": 181, "爆品数": 18, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 7, "拜访风险": "正常", "一级行业描述": "Vehicle Parts & Accessories", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "广东吉盛科实业有限公司", "拍档销售": "杨婷婷", "线上信保分层": "头部", "财年实收": 392323, "上财年同期实收": 137511, "财年同比": 185.3, "当月实收": 65011, "目标": 68717, "当月完成率": 94.6, "当月同比": -5.4, "近6个月月均GMV": 83812, "优品数": 77, "爆品数": 1, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 29, "拜访风险": "正常", "一级行业描述": "Lights & Lighting", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市鑫盛服装有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "财年实收": 624606, "上财年同期实收": 545038, "财年同比": 14.6, "当月实收": 138775, "目标": 118207, "当月完成率": 117.4, "当月同比": 17.4, "近6个月月均GMV": 152221, "优品数": 451, "爆品数": 24, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 6, "拜访风险": "正常", "一级行业描述": "Apparel & Accessories", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市佰腾塑胶五金制品有限公司", "拍档销售": "赵舒越", "线上信保分层": "超头部", "财年实收": 870717, "上财年同期实收": 538854, "财年同比": 61.6, "当月实收": 81951, "目标": 149503, "当月完成率": 54.8, "当月同比": -45.2, "近6个月月均GMV": 163199, "优品数": 80, "爆品数": 6, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 63, "拜访风险": "高风险", "一级行业描述": "Home Appliances", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市合康服装辅料有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "财年实收": 232017, "上财年同期实收": 154162, "财年同比": 50.5, "当月实收": 36640, "目标": 37946, "当月完成率": 96.6, "当月同比": -3.4, "近6个月月均GMV": 58592, "优品数": 336, "爆品数": 15, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 68, "拜访风险": "高风险", "一级行业描述": "Apparel & Accessories", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市零点潮流服饰有限公司", "拍档销售": "高盛强", "线上信保分层": "头部", "财年实收": 290377, "上财年同期实收": 0, "财年同比": 0.0, "当月实收": 47539, "目标": 0, "当月完成率": 0.0, "当月同比": 0.0, "近6个月月均GMV": 72698, "优品数": 21, "爆品数": 0, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 28, "拜访风险": "正常", "一级行业描述": "Apparel & Accessories", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "尚睿科技股份有限公司", "拍档销售": "燕磊", "线上信保分层": "超头部", "财年实收": 748525, "上财年同期实收": 0, "财年同比": 0.0, "当月实收": 0, "目标": 0, "当月完成率": 0.0, "当月同比": 0.0, "近6个月月均GMV": 561135, "优品数": 0, "爆品数": 0, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 25, "拜访风险": "正常", "一级行业描述": "Consumer Electronics", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市振欣汽车用品有限公司", "拍档销售": "刘鑫", "线上信保分层": "头部", "财年实收": 316013, "上财年同期实收": 473837, "财年同比": -33.3, "当月实收": 39347, "目标": 24663, "当月完成率": 159.5, "当月同比": 59.5, "近6个月月均GMV": 93232, "优品数": 175, "爆品数": 14, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 13, "拜访风险": "正常", "一级行业描述": "Vehicle Parts & Accessories", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市煦昌服饰有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "财年实收": 656349, "上财年同期实收": 495409, "财年同比": 32.5, "当月实收": 163790, "目标": 111486, "当月完成率": 146.9, "当月同比": 46.9, "近6个月月均GMV": 148113, "优品数": 263, "爆品数": 2, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 5, "拜访风险": "正常", "一级行业描述": "Apparel & Accessories", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市国丰制造有限公司", "拍档销售": "杨婷婷", "线上信保分层": "超头部", "财年实收": 297742, "上财年同期实收": 291826, "财年同比": 2.0, "当月实收": 77829, "目标": 18607, "当月完成率": 418.3, "当月同比": 318.3, "近6个月月均GMV": 123082, "优品数": 184, "爆品数": 6, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 28, "拜访风险": "正常", "一级行业描述": "Metals & Alloys", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市佰腾塑胶五金制品有限公司", "拍档销售": "赵舒越", "线上信保分层": "头部", "财年实收": 273325, "上财年同期实收": 117228, "财年同比": 133.2, "当月实收": 112086, "目标": 12833, "当月完成率": 873.4, "当月同比": 773.4, "近6个月月均GMV": 51267, "优品数": 65, "爆品数": 6, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 63, "拜访风险": "高风险", "一级行业描述": "Home Appliances", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市维丽纳首饰智造有限公司", "拍档销售": "高盛强", "线上信保分层": "头部", "财年实收": 285025, "上财年同期实收": 364750, "财年同比": -21.9, "当月实收": 42122, "目标": 60145, "当月完成率": 70.0, "当月同比": -30.0, "近6个月月均GMV": 74495, "优品数": 71, "爆品数": 1, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 0, "拜访风险": "正常", "一级行业描述": "Jewelry, Eyewear, Watches & Accessories", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市千加依电子商务有限公司", "拍档销售": "高盛强", "线上信保分层": "头部", "财年实收": 279078, "上财年同期实收": 325300, "财年同比": -14.2, "当月实收": 48237, "目标": 77299, "当月完成率": 62.4, "当月同比": -37.6, "近6个月月均GMV": 63416, "优品数": 119, "爆品数": 6, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 5, "拜访风险": "正常", "一级行业描述": "Apparel & Accessories", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "广东绿达新能源有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "财年实收": 40571925, "上财年同期实收": 43400, "财年同比": 93383.7, "当月实收": 7584683, "目标": 43400, "当月完成率": 17476.2, "当月同比": 17376.2, "近6个月月均GMV": 8501411, "优品数": 82, "爆品数": 8, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 12, "拜访风险": "正常", "一级行业描述": "Renewable Energy", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市兴风林有机玻璃制品有限公司", "拍档销售": "赵舒越", "线上信保分层": "超头部", "财年实收": 1136593, "上财年同期实收": 223307, "财年同比": 409.0, "当月实收": 333973, "目标": 21450, "当月完成率": 1557.0, "当月同比": 1457.0, "近6个月月均GMV": 208641, "优品数": 108, "爆品数": 6, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 60, "拜访风险": "中风险", "一级行业描述": "Commercial Equipment & Machinery", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市晋源祥塑胶五金电子有限公司", "拍档销售": "赵舒越", "线上信保分层": "超头部", "财年实收": 495767, "上财年同期实收": 352743, "财年同比": 40.5, "当月实收": 101953, "目标": 46161, "当月完成率": 220.9, "当月同比": 120.9, "近6个月月均GMV": 129949, "优品数": 73, "爆品数": 1, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 6, "拜访风险": "正常", "一级行业描述": "Lights & Lighting", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市海翔胶粘制品有限公司", "拍档销售": "杨婷婷", "线上信保分层": "头部", "财年实收": 430353, "上财年同期实收": 117910, "财年同比": 265.0, "当月实收": 126658, "目标": 16787, "当月完成率": 754.5, "当月同比": 654.5, "近6个月月均GMV": 97180, "优品数": 183, "爆品数": 5, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 63, "拜访风险": "高风险", "一级行业描述": "Packaging & Printing", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市沅达世纪照明科技有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "头部", "财年实收": 312656, "上财年同期实收": 292445, "财年同比": 6.9, "当月实收": 91358, "目标": 66661, "当月完成率": 137.0, "当月同比": 37.0, "近6个月月均GMV": 87528, "优品数": 115, "爆品数": 5, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 55, "拜访风险": "中风险", "一级行业描述": "Vehicle Parts & Accessories", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市瑞飞服装有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "财年实收": 291449, "上财年同期实收": 326827, "财年同比": -10.8, "当月实收": 46319, "目标": 58583, "当月完成率": 79.1, "当月同比": -20.9, "近6个月月均GMV": 63353, "优品数": 343, "爆品数": 12, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 98, "拜访风险": "高风险", "一级行业描述": "Apparel & Accessories", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市益卡包装制品有限公司", "拍档销售": "高盛强", "线上信保分层": "头部", "财年实收": 418488, "上财年同期实收": 416554, "财年同比": 0.5, "当月实收": 100326, "目标": 60928, "当月完成率": 164.7, "当月同比": 64.7, "近6个月月均GMV": 90676, "优品数": 361, "爆品数": 28, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 96, "拜访风险": "高风险", "一级行业描述": "Packaging & Printing", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市晟熙服饰有限公司", "拍档销售": "杨婷婷", "线上信保分层": "超头部", "财年实收": 630408, "上财年同期实收": 323284, "财年同比": 95.0, "当月实收": 201885, "目标": 46829, "当月完成率": 431.1, "当月同比": 331.1, "近6个月月均GMV": 122951, "优品数": 108, "爆品数": 7, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 189, "拜访风险": "高风险", "一级行业描述": "Apparel & Accessories", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞汐兮皮革制品有限公司", "拍档销售": "杨婷婷", "线上信保分层": "头部", "财年实收": 312563, "上财年同期实收": 117559, "财年同比": 165.9, "当月实收": 19459, "目标": 86340, "当月完成率": 22.5, "当月同比": -77.5, "近6个月月均GMV": 82250, "优品数": 292, "爆品数": 28, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 68, "拜访风险": "高风险", "一级行业描述": "Home & Garden", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市贤祥五金电子科技有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "财年实收": 308050, "上财年同期实收": 132369, "财年同比": 132.7, "当月实收": 53300, "目标": 18830, "当月完成率": 283.1, "当月同比": 183.1, "近6个月月均GMV": 67826, "优品数": 185, "爆品数": 8, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 91, "拜访风险": "高风险", "一级行业描述": "Consumer Electronics", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "深圳市豪盛达包装制品有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "超头部", "财年实收": 519598, "上财年同期实收": 631836, "财年同比": -17.8, "当月实收": 75512, "目标": 93632, "当月完成率": 80.6, "当月同比": -19.4, "近6个月月均GMV": 114104, "优品数": 157, "爆品数": 17, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 34, "拜访风险": "中风险", "一级行业描述": "Packaging & Printing", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市恒越实业有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "超头部", "财年实收": 411567, "上财年同期实收": 1709507, "财年同比": -75.9, "当月实收": 1309, "目标": 797646, "当月完成率": 0.2, "当月同比": -99.8, "近6个月月均GMV": 165142, "优品数": 24, "爆品数": 0, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 0, "拜访风险": "正常", "一级行业描述": "Pet Supplies", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市联迪科技有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "财年实收": 1509628, "上财年同期实收": 1251931, "财年同比": 20.6, "当月实收": 528846, "目标": 426935, "当月完成率": 123.9, "当月同比": 23.9, "近6个月月均GMV": 442508, "优品数": 282, "爆品数": 10, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 55, "拜访风险": "中风险", "一级行业描述": "Consumer Electronics", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市晋源祥塑胶五金电子有限公司", "拍档销售": "赵舒越", "线上信保分层": "超头部", "财年实收": 603242, "上财年同期实收": 265374, "财年同比": 127.3, "当月实收": 54, "目标": 87249, "当月完成率": 0.1, "当月同比": -99.9, "近6个月月均GMV": 133062, "优品数": 83, "爆品数": 1, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 6, "拜访风险": "正常", "一级行业描述": "Home & Garden", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市新腾东机械设备有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "头部", "财年实收": 259688, "上财年同期实收": 56217, "财年同比": 361.9, "当月实收": 23107, "目标": 56217, "当月完成率": 41.1, "当月同比": -58.9, "近6个月月均GMV": 69262, "优品数": 14, "爆品数": 0, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 27, "拜访风险": "正常", "一级行业描述": "Industrial Machinery", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市联迪科技有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "财年实收": 446642, "上财年同期实收": 497182, "财年同比": -10.2, "当月实收": 5585, "目标": 12041, "当月完成率": 46.4, "当月同比": -53.6, "近6个月月均GMV": 169629, "优品数": 26, "爆品数": 0, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 55, "拜访风险": "中风险", "一级行业描述": "Consumer Electronics", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市中达电子科技有限公司", "拍档销售": "杨婷婷", "线上信保分层": "超头部", "财年实收": 548225, "上财年同期实收": 562077, "财年同比": -2.5, "当月实收": 93984, "目标": 130826, "当月完成率": 71.8, "当月同比": -28.2, "近6个月月均GMV": 118664, "优品数": 383, "爆品数": 45, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 38, "拜访风险": "中风险", "一级行业描述": "Sports & Entertainment", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市日东智能装备有限公司", "拍档销售": "杨婷婷", "线上信保分层": "超头部", "财年实收": 505854, "上财年同期实收": 153088, "财年同比": 230.4, "当月实收": 139892, "目标": 20279, "当月完成率": 689.8, "当月同比": 589.8, "近6个月月均GMV": 109299, "优品数": 47, "爆品数": 0, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 42, "拜访风险": "中风险", "一级行业描述": "Industrial Machinery", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市茗创优尚电子科技有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "超头部", "财年实收": 582588, "上财年同期实收": 431151, "财年同比": 35.1, "当月实收": 123337, "目标": 121998, "当月完成率": 101.1, "当月同比": 1.1, "近6个月月均GMV": 127183, "优品数": 10, "爆品数": 0, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 60, "拜访风险": "中风险", "一级行业描述": "Home Appliances", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市纱美特服饰有限公司", "拍档销售": "李朝燕", "线上信保分层": "头部", "财年实收": 423589, "上财年同期实收": 198551, "财年同比": 113.3, "当月实收": 258098, "目标": 42391, "当月完成率": 608.9, "当月同比": 508.9, "近6个月月均GMV": 75824, "优品数": 35, "爆品数": 2, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 67, "拜访风险": "高风险", "一级行业描述": "Apparel & Accessories", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市信诺皮革有限公司", "拍档销售": "杨婷婷", "线上信保分层": "超头部", "财年实收": 573580, "上财年同期实收": 153064, "财年同比": 274.7, "当月实收": 75252, "目标": 11165, "当月完成率": 674.0, "当月同比": 574.0, "近6个月月均GMV": 152304, "优品数": 915, "爆品数": 65, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 57, "拜访风险": "中风险", "一级行业描述": "Fabric & Textile Raw Material", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市逸宸服饰有限公司", "拍档销售": "高盛强", "线上信保分层": "头部", "财年实收": 225769, "上财年同期实收": 207120, "财年同比": 9.0, "当月实收": 27503, "目标": 14061, "当月完成率": 195.6, "当月同比": 95.6, "近6个月月均GMV": 70892, "优品数": 31, "爆品数": 1, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 19, "拜访风险": "正常", "一级行业描述": "Apparel & Accessories", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "深圳市诺芙科技有限公司", "拍档销售": "杨婷婷", "线上信保分层": "超头部", "财年实收": 510226, "上财年同期实收": 380891, "财年同比": 34.0, "当月实收": 93897, "目标": 53380, "当月完成率": 175.9, "当月同比": 75.9, "近6个月月均GMV": 106443, "优品数": 136, "爆品数": 10, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 48, "拜访风险": "中风险", "一级行业描述": "Beauty", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "广东创点智能科技有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "头部", "财年实收": 327657, "上财年同期实收": 330275, "财年同比": -0.8, "当月实收": 89233, "目标": 49644, "当月完成率": 179.7, "当月同比": 79.7, "近6个月月均GMV": 70668, "优品数": 15, "爆品数": 0, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 102, "拜访风险": "高风险", "一级行业描述": "Construction & Real Estate", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市好印象实业有限公司", "拍档销售": "杨婷婷", "线上信保分层": "超头部", "财年实收": 465642, "上财年同期实收": 487739, "财年同比": -4.5, "当月实收": 707, "目标": 330, "当月完成率": 214.2, "当月同比": 114.2, "近6个月月均GMV": 112356, "优品数": 67, "爆品数": 5, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 41, "拜访风险": "中风险", "一级行业描述": "Home & Garden", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞敏诺科技有限公司", "拍档销售": "赵舒越", "线上信保分层": "头部", "财年实收": 409645, "上财年同期实收": 275803, "财年同比": 48.5, "当月实收": 114810, "目标": 134794, "当月完成率": 85.2, "当月同比": -14.8, "近6个月月均GMV": 81221, "优品数": 1, "爆品数": 0, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 82, "拜访风险": "高风险", "一级行业描述": "Sports & Entertainment", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市星灿服饰有限公司", "拍档销售": "高盛强", "线上信保分层": "头部", "财年实收": 396786, "上财年同期实收": 300589, "财年同比": 32.0, "当月实收": 53762, "目标": 65256, "当月完成率": 82.4, "当月同比": -17.6, "近6个月月均GMV": 99787, "优品数": 298, "爆品数": 58, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 67, "拜访风险": "高风险", "一级行业描述": "Apparel & Accessories", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市玲之秀服饰有限公司", "拍档销售": "刘鑫", "线上信保分层": "头部", "财年实收": 375784, "上财年同期实收": 447747, "财年同比": -16.1, "当月实收": 150461, "目标": 144780, "当月完成率": 103.9, "当月同比": 3.9, "近6个月月均GMV": 79698, "优品数": 66, "爆品数": 8, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 26, "拜访风险": "正常", "一级行业描述": "Apparel & Accessories", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞晓龙包装实业有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "财年实收": 257816, "上财年同期实收": 180217, "财年同比": 43.1, "当月实收": 23877, "目标": 12311, "当月完成率": 193.9, "当月同比": 93.9, "近6个月月均GMV": 72302, "优品数": 171, "爆品数": 5, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 26, "拜访风险": "正常", "一级行业描述": "Packaging & Printing", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市圣锦服饰有限公司", "拍档销售": "高盛强", "线上信保分层": "头部", "财年实收": 379753, "上财年同期实收": 0, "财年同比": 0.0, "当月实收": 54081, "目标": 0, "当月完成率": 0.0, "当月同比": 0.0, "近6个月月均GMV": 82750, "优品数": 46, "爆品数": 1, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 19, "拜访风险": "正常", "一级行业描述": "Apparel & Accessories", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市盛东碳纤维科技有限公司", "拍档销售": "赵舒越", "线上信保分层": "头部", "财年实收": 381194, "上财年同期实收": 334036, "财年同比": 14.1, "当月实收": 61750, "目标": 35753, "当月完成率": 172.7, "当月同比": 72.7, "近6个月月均GMV": 86429, "优品数": 21, "爆品数": 0, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 25, "拜访风险": "正常", "一级行业描述": "Vehicle Parts & Accessories", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "金顺新材料科技（广东）有限公司", "拍档销售": "李朝燕", "线上信保分层": "超头部", "财年实收": 612682, "上财年同期实收": 305428, "财年同比": 100.6, "当月实收": 303477, "目标": 810, "当月完成率": 37466.3, "当月同比": 37366.3, "近6个月月均GMV": 104010, "优品数": 50, "爆品数": 4, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 2, "拜访风险": "正常", "一级行业描述": "Home & Garden", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市蓝彩服装有限公司", "拍档销售": "狄鹏", "线上信保分层": "超头部", "财年实收": 574330, "上财年同期实收": 465279, "财年同比": 23.4, "当月实收": 91955, "目标": 82144, "当月完成率": 111.9, "当月同比": 11.9, "近6个月月均GMV": 118506, "优品数": 139, "爆品数": 6, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 27, "拜访风险": "正常", "一级行业描述": "Apparel & Accessories", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "广东顶厨智能家居科技有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "超头部", "财年实收": 1145284, "上财年同期实收": 1032452, "财年同比": 10.9, "当月实收": 1761, "目标": 552, "当月完成率": 319.0, "当月同比": 219.0, "近6个月月均GMV": 321635, "优品数": 96, "爆品数": 7, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 7, "拜访风险": "正常", "一级行业描述": "Home Appliances", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市同恩进出口有限公司", "拍档销售": "刘鑫", "线上信保分层": "超头部", "财年实收": 401418, "上财年同期实收": 508016, "财年同比": -21.0, "当月实收": 39402, "目标": 161, "当月完成率": 24473.3, "当月同比": 24373.3, "近6个月月均GMV": 118878, "优品数": 9, "爆品数": 0, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 68, "拜访风险": "高风险", "一级行业描述": "Electrical Equipment & Supplies", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市永方电子科技有限公司", "拍档销售": "燕磊", "线上信保分层": "超头部", "财年实收": 872729, "上财年同期实收": 250439, "财年同比": 248.5, "当月实收": 319895, "目标": 149075, "当月完成率": 214.6, "当月同比": 114.6, "近6个月月均GMV": 202220, "优品数": 108, "爆品数": 4, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 25, "拜访风险": "正常", "一级行业描述": "Consumer Electronics", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "广东吉盛科实业有限公司", "拍档销售": "杨婷婷", "线上信保分层": "超头部", "财年实收": 482014, "上财年同期实收": 358814, "财年同比": 34.3, "当月实收": 135801, "目标": 2468, "当月完成率": 5502.5, "当月同比": 5402.5, "近6个月月均GMV": 116836, "优品数": 92, "爆品数": 1, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 29, "拜访风险": "正常", "一级行业描述": "Lights & Lighting", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市益卡环保科技有限公司", "拍档销售": "高盛强", "线上信保分层": "头部", "财年实收": 324406, "上财年同期实收": 360294, "财年同比": -10.0, "当月实收": 67226, "目标": 41558, "当月完成率": 161.8, "当月同比": 61.8, "近6个月月均GMV": 75922, "优品数": 387, "爆品数": 29, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 96, "拜访风险": "高风险", "一级行业描述": "Packaging & Printing", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市班墨机械有限公司", "拍档销售": "刘鑫", "线上信保分层": "头部", "财年实收": 272284, "上财年同期实收": 207234, "财年同比": 31.4, "当月实收": 27923, "目标": 43639, "当月完成率": 64.0, "当月同比": -36.0, "近6个月月均GMV": 66346, "优品数": 655, "爆品数": 76, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 4, "拜访风险": "正常", "一级行业描述": "Industrial Machinery", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市万泽家居用品有限公司", "拍档销售": "燕磊", "线上信保分层": "超头部", "财年实收": 436765, "上财年同期实收": 159273, "财年同比": 174.2, "当月实收": 100000, "目标": 19465, "当月完成率": 513.7, "当月同比": 413.7, "近6个月月均GMV": 114397, "优品数": 0, "爆品数": 0, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 41, "拜访风险": "中风险", "一级行业描述": "Home & Garden", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市迪优门窗科技有限公司", "拍档销售": "高盛强", "线上信保分层": "头部", "财年实收": 452332, "上财年同期实收": 762789, "财年同比": -40.7, "当月实收": 124644, "目标": 291542, "当月完成率": 42.8, "当月同比": -57.2, "近6个月月均GMV": 94060, "优品数": 11, "爆品数": 0, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 29, "拜访风险": "正常", "一级行业描述": "Construction & Real Estate", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市同睿服饰有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "财年实收": 416612, "上财年同期实收": 656310, "财年同比": -36.5, "当月实收": 72640, "目标": 132199, "当月完成率": 54.9, "当月同比": -45.1, "近6个月月均GMV": 101178, "优品数": 194, "爆品数": 10, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 19, "拜访风险": "正常", "一级行业描述": "Apparel & Accessories", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "江西省胜明电子科技有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "超头部", "财年实收": 1087800, "上财年同期实收": 434358, "财年同比": 150.4, "当月实收": 381670, "目标": 4766, "当月完成率": 8008.2, "当月同比": 7908.2, "近6个月月均GMV": 335585, "优品数": 119, "爆品数": 6, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 102, "拜访风险": "高风险", "一级行业描述": "Home Appliances", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市大美实业有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "超头部", "财年实收": 200949, "上财年同期实收": 532185, "财年同比": -62.2, "当月实收": 80340, "目标": 200880, "当月完成率": 40.0, "当月同比": -60.0, "近6个月月均GMV": 100427, "优品数": 12, "爆品数": 0, "合作意愿度": "中", "是否实收预警": "N", "近一次有效拜访距今天数": 47, "拜访风险": "中风险", "一级行业描述": "Home & Garden", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}, {"客户名称": "东莞市同恩进出口有限公司", "拍档销售": "刘鑫", "线上信保分层": "头部", "财年实收": 388782, "上财年同期实收": 384861, "财年同比": 1.0, "当月实收": 168635, "目标": 31171, "当月完成率": 541.0, "当月同比": 441.0, "近6个月月均GMV": 93083, "优品数": 111, "爆品数": 1, "合作意愿度": "高", "是否实收预警": "N", "近一次有效拜访距今天数": 68, "拜访风险": "高风险", "一级行业描述": "Agriculture", "ACP收汇金额_当月": 0, "ACP收汇金额_近180天": 0}], "drop20": [{"客户名称": "东莞市晋源祥塑胶五金电子有限公司", "拍档销售": "赵舒越", "线上信保分层": "超头部", "当月实收": 54, "目标": 87249, "当月同比": -99.9, "财年实收": 603242, "合作意愿度": "高", "拜访风险": "正常"}, {"客户名称": "东莞市恒越实业有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "超头部", "当月实收": 1309, "目标": 797646, "当月同比": -99.8, "财年实收": 411567, "合作意愿度": "中", "拜访风险": "正常"}, {"客户名称": "广东千度科技有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "当月实收": 3370, "目标": 329897, "当月同比": -99.0, "财年实收": 1064969, "合作意愿度": "高", "拜访风险": "中风险"}, {"客户名称": "东莞市焜腾科技有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "头部", "当月实收": 1854, "目标": 46734, "当月同比": -96.0, "财年实收": 192651, "合作意愿度": "高", "拜访风险": "正常"}, {"客户名称": "深圳市刘氏太阳能铁锂能源有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "超头部", "当月实收": 36020, "目标": 501220, "当月同比": -92.8, "财年实收": 211866, "合作意愿度": "中", "拜访风险": "正常"}, {"客户名称": "东莞市联迪科技有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "当月实收": 7115, "目标": 79266, "当月同比": -91.0, "财年实收": 453633, "合作意愿度": "高", "拜访风险": "中风险"}, {"客户名称": "深圳联合触控科技有限公司", "拍档销售": "高盛强", "线上信保分层": "头部", "当月实收": 27418, "目标": 151800, "当月同比": -81.9, "财年实收": 175453, "合作意愿度": "高", "拜访风险": "中风险"}, {"客户名称": "东莞汐兮皮革制品有限公司", "拍档销售": "杨婷婷", "线上信保分层": "头部", "当月实收": 19459, "目标": 86340, "当月同比": -77.5, "财年实收": 312563, "合作意愿度": "高", "拜访风险": "高风险"}, {"客户名称": "东莞市汇合数据科技有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "当月实收": 26894, "目标": 117235, "当月同比": -77.1, "财年实收": 438241, "合作意愿度": "高", "拜访风险": "正常"}, {"客户名称": "东莞市迪柯精密五金有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "当月实收": 11543, "目标": 41722, "当月同比": -72.3, "财年实收": 200308, "合作意愿度": "高", "拜访风险": "高风险"}, {"客户名称": "东莞市巧手服饰有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "当月实收": 44734, "目标": 147692, "当月同比": -69.7, "财年实收": 236616, "合作意愿度": "高", "拜访风险": "高风险"}, {"客户名称": "东莞市大美实业有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "超头部", "当月实收": 80340, "目标": 200880, "当月同比": -60.0, "财年实收": 200949, "合作意愿度": "中", "拜访风险": "中风险"}, {"客户名称": "东莞市玉煌电子科技有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "头部", "当月实收": 35048, "目标": 85637, "当月同比": -59.1, "财年实收": 254050, "合作意愿度": "高", "拜访风险": "正常"}, {"客户名称": "东莞市新腾东机械设备有限公司", "拍档销售": "欧阳杰俊", "线上信保分层": "头部", "当月实收": 23107, "目标": 56217, "当月同比": -58.9, "财年实收": 259688, "合作意愿度": "高", "拜访风险": "正常"}, {"客户名称": "东莞市迪优门窗科技有限公司", "拍档销售": "高盛强", "线上信保分层": "头部", "当月实收": 124644, "目标": 291542, "当月同比": -57.2, "财年实收": 452332, "合作意愿度": "中", "拜访风险": "正常"}, {"客户名称": "东莞市联迪科技有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "当月实收": 5585, "目标": 12041, "当月同比": -53.6, "财年实收": 446642, "合作意愿度": "高", "拜访风险": "中风险"}, {"客户名称": "东莞市佰腾塑胶五金制品有限公司", "拍档销售": "赵舒越", "线上信保分层": "超头部", "当月实收": 81951, "目标": 149503, "当月同比": -45.2, "财年实收": 870717, "合作意愿度": "高", "拜访风险": "高风险"}, {"客户名称": "东莞市同睿服饰有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "当月实收": 72640, "目标": 132199, "当月同比": -45.1, "财年实收": 416612, "合作意愿度": "高", "拜访风险": "正常"}, {"客户名称": "金顺新材料科技(广东)有限公司", "拍档销售": "李朝燕", "线上信保分层": "超头部", "当月实收": 317014, "目标": 529510, "当月同比": -40.1, "财年实收": 1946579, "合作意愿度": "高", "拜访风险": "正常"}, {"客户名称": "东莞市永奇玩具科技有限公司", "拍档销售": "赵舒越", "线上信保分层": "头部", "当月实收": 51493, "目标": 82742, "当月同比": -37.8, "财年实收": 263171, "合作意愿度": "高", "拜访风险": "中风险"}, {"客户名称": "东莞市千加依电子商务有限公司", "拍档销售": "高盛强", "线上信保分层": "头部", "当月实收": 48237, "目标": 77299, "当月同比": -37.6, "财年实收": 279078, "合作意愿度": "高", "拜访风险": "正常"}, {"客户名称": "东莞市班墨机械有限公司", "拍档销售": "刘鑫", "线上信保分层": "头部", "当月实收": 27923, "目标": 43639, "当月同比": -36.0, "财年实收": 272284, "合作意愿度": "中", "拜访风险": "正常"}, {"客户名称": "东莞金保马科技有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "当月实收": 51280, "目标": 78194, "当月同比": -34.4, "财年实收": 272349, "合作意愿度": "中", "拜访风险": "正常"}, {"客户名称": "东莞市三英手袋有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "当月实收": 48999, "目标": 74586, "当月同比": -34.3, "财年实收": 327062, "合作意愿度": "高", "拜访风险": "正常"}, {"客户名称": "东莞市维丽纳首饰智造有限公司", "拍档销售": "高盛强", "线上信保分层": "头部", "当月实收": 42122, "目标": 60145, "当月同比": -30.0, "财年实收": 285025, "合作意愿度": "高", "拜访风险": "正常"}, {"客户名称": "广东逸动生活服饰科技有限公司", "拍档销售": "高盛强", "线上信保分层": "超头部", "当月实收": 344803, "目标": 485022, "当月同比": -28.9, "财年实收": 1471706, "合作意愿度": "高", "拜访风险": "正常"}, {"客户名称": "东莞市中达电子科技有限公司", "拍档销售": "杨婷婷", "线上信保分层": "超头部", "当月实收": 93984, "目标": 130826, "当月同比": -28.2, "财年实收": 548225, "合作意愿度": "高", "拜访风险": "中风险"}, {"客户名称": "广东宏凯光缆设备科技有限公司", "拍档销售": "李朝燕", "线上信保分层": "头部", "当月实收": 800, "目标": 1078, "当月同比": -25.8, "财年实收": 359690, "合作意愿度": "中", "拜访风险": "正常"}, {"客户名称": "东莞市瑞飞服装有限公司", "拍档销售": "燕磊", "线上信保分层": "头部", "当月实收": 46319, "目标": 58583, "当月同比": -20.9, "财年实收": 291449, "合作意愿度": "高", "拜访风险": "高风险"}]};
 
 const SS = RAW_DATA.sales_summary;
 const SD = RAW_DATA.sales_detail;
 const CUSTS = RAW_DATA.customers;
+const DROP20 = RAW_DATA.drop20;
 
-// helpers
-function fmt(n){ if(n===0||n===null||n===undefined) return '-'; if(n>=10000) return (n/10000).toFixed(1)+'万'; return n.toLocaleString(); }
-function fmtW(n){ if(!n&&n!==0) return '-'; return (n/10000).toFixed(2)+'万'; }
-function pct(v){ if(v===0||v===null||v===undefined||isNaN(v)) return '-'; return (v>0?'+':'')+v.toFixed(1)+'%'; }
-function pctColor(v){ return v>0?'var(--green)':v<0?'var(--red)':'var(--text3)'; }
+function fmtW(n){if(!n&&n!==0)return'-';const v=Number(n);if(isNaN(v))return'-';if(Math.abs(v)>=10000)return(v/10000).toFixed(2)+'万';return v.toLocaleString()+'元'}
+function fmtW2(n){if(!n&&n!==0)return'-';const v=Number(n);if(isNaN(v))return'-';return(v/10000).toFixed(1)+'万'}
+function pct(v){if(v===0||v===null||v===undefined||isNaN(v))return'-';return(v>0?'+':'')+Number(v).toFixed(1)+'%'}
+function pctColor(v){const n=Number(v);return n>0?'var(--green)':n<0?'var(--red)':'var(--text3)'}
+function compColor(v){const n=Number(v);if(isNaN(n))return'var(--text3)';return n>=100?'var(--green)':n>=70?'var(--warn)':'var(--red)'}
 
-// ===================== OVERVIEW =====================
+// ============ 总览 ============
 function buildOverview(){
   const totalRev = SS.reduce((a,s)=>a+s['财年实收'],0);
   const totalLastRev = SS.reduce((a,s)=>a+s['上财年同期实收'],0);
   const superCnt = SS.reduce((a,s)=>a+s['超头部客户数'],0);
   const headCnt = SS.reduce((a,s)=>a+s['头部客户数'],0);
+  const totalMonthRev = SS.reduce((a,s)=>a+s['当月实收'],0);
+  const totalMonthTarget = SS.reduce((a,s)=>a+s['当月目标'],0);
+  const overallComp = totalMonthTarget>0?(totalMonthRev/totalMonthTarget*100):0;
   const warnCnt = SS.reduce((a,s)=>a+s['拜访预警数'],0);
-  const yoyTotal = totalLastRev>0?((totalRev-totalLastRev)/totalLastRev*100):0;
 
   document.getElementById('kpi-overview').innerHTML = `
     <div class="kpi-card super-card">
@@ -312,132 +307,122 @@ function buildOverview(){
       <div class="kpi-val head-val">${headCnt}</div>
       <div class="kpi-sub">占比 ${(headCnt/(superCnt+headCnt)*100).toFixed(0)}%</div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-label">财年实收合计</div>
-      <div class="kpi-val" style="color:var(--text)">${(totalRev/10000).toFixed(1)}万</div>
-      <div class="kpi-sub" style="color:${pctColor(yoyTotal)}">同比 ${pct(yoyTotal)}</div>
+    <div class="kpi-card" style="border-color:rgba(167,139,250,.4);background:linear-gradient(135deg,var(--card),rgba(167,139,250,.08))">
+      <div class="kpi-label">当月整体完成率</div>
+      <div class="kpi-val" style="color:${compColor(overallComp)}">${overallComp.toFixed(1)}%</div>
+      <div class="kpi-sub">实收 ${fmtW2(totalMonthRev)} / 目标 ${fmtW2(totalMonthTarget)}</div>
     </div>
     <div class="kpi-card warn-card">
-      <div class="kpi-label">拜访预警客户数</div>
-      <div class="kpi-val warn-val">${warnCnt}</div>
-      <div class="kpi-sub">有效拜访 >30天</div>
+      <div class="kpi-label">下滑超20%客户</div>
+      <div class="kpi-val red">${DROP20.length}</div>
+      <div class="kpi-sub">当月 vs 去年同月</div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-label">当月实收合计</div>
-      <div class="kpi-val" style="color:var(--green)">${(SS.reduce((a,s)=>a+s['当月实收'],0)/10000).toFixed(1)}万</div>
-      <div class="kpi-sub">月均GMV ${(SS.reduce((a,s)=>a+s['月均GMV'],0)/10000).toFixed(0)}万</div>
+      <div class="kpi-label">财年实收合计</div>
+      <div class="kpi-val" style="color:var(--text)">${(totalRev/10000).toFixed(0)}万</div>
+      <div class="kpi-sub" style="color:${pctColor((totalRev-totalLastRev)/totalLastRev*100)}">同比 ${pct((totalRev-totalLastRev)/totalLastRev*100)}</div>
     </div>
   `;
 
-  // Chart1: 各销售财年实收堆叠柱
   const salesOrder = [...SS].sort((a,b)=>b['财年实收']-a['财年实收']);
   const labels = salesOrder.map(s=>s['拍档销售']);
 
-  const superRevs = SD.filter(r=>r['线上信保分层']==='超头部');
-  const headRevs  = SD.filter(r=>r['线上信保分层']==='头部');
-  const getSuperRev = name => { const r=superRevs.find(x=>x['拍档销售']===name); return r?r['财年实收']/10000:0; };
-  const getHeadRev  = name => { const r=headRevs.find(x=>x['拍档销售']===name); return r?r['财年实收']/10000:0; };
-
-  new Chart(document.getElementById('chartRevByPerson').getContext('2d'), {
+  // 财年实收堆叠
+  const getLayerRev = (name,layer) => { const r=SD.find(x=>x['拍档销售']===name&&x['线上信保分层']===layer); return r?r['财年实收']/10000:0; };
+  new Chart(document.getElementById('chartRevByPerson').getContext('2d'),{
     type:'bar',
-    data:{ labels,
-      datasets:[
-        { label:'超头部实收(万)', data:labels.map(getSuperRev), backgroundColor:'rgba(245,158,11,0.75)', borderRadius:3 },
-        { label:'头部实收(万)', data:labels.map(getHeadRev), backgroundColor:'rgba(56,189,248,0.65)', borderRadius:3 }
-      ]
-    },
-    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:11}}}},
-      scales:{ x:{stacked:true,ticks:{color:'#64748b',font:{size:11}},grid:{color:'rgba(45,55,72,0.5)'}},
-               y:{stacked:true,ticks:{color:'#64748b',font:{size:11},callback:v=>v.toFixed(0)+'万'},grid:{color:'rgba(45,55,72,0.3)'}} }}
+    data:{labels,datasets:[
+      {label:'超头部',data:labels.map(n=>getLayerRev(n,'超头部')),backgroundColor:'rgba(245,158,11,.75)',borderRadius:3},
+      {label:'头部',data:labels.map(n=>getLayerRev(n,'头部')),backgroundColor:'rgba(56,189,248,.65)',borderRadius:3}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:11}}}},
+      scales:{x:{stacked:true,ticks:{color:'#64748b',font:{size:10}},grid:{color:'rgba(45,55,72,.5)'}},
+              y:{stacked:true,ticks:{color:'#64748b',font:{size:10},callback:v=>v+'万'},grid:{color:'rgba(45,55,72,.3)'}}}}
   });
 
-  // Chart2: 客户数量 (超/头)
-  const getSuperCnt = name => { const r=SS.find(x=>x['拍档销售']===name); return r?r['超头部客户数']:0; };
-  const getHeadCnt  = name => { const r=SS.find(x=>x['拍档销售']===name); return r?r['头部客户数']:0; };
-  new Chart(document.getElementById('chartCntByPerson').getContext('2d'), {
+  // 当月实收 vs 目标
+  const monthOrder = [...SS].sort((a,b)=>b['当月实收']-a['当月实收']);
+  const mLabels = monthOrder.map(s=>s['拍档销售']);
+  new Chart(document.getElementById('chartMonthTarget').getContext('2d'),{
     type:'bar',
-    data:{ labels,
-      datasets:[
-        { label:'超头部客户数', data:labels.map(getSuperCnt), backgroundColor:'rgba(245,158,11,0.75)', borderRadius:3 },
-        { label:'头部客户数', data:labels.map(getHeadCnt), backgroundColor:'rgba(56,189,248,0.65)', borderRadius:3 }
-      ]
-    },
-    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:11}}}},
-      scales:{ x:{stacked:true,ticks:{color:'#64748b',font:{size:11}},grid:{color:'rgba(45,55,72,0.5)'}},
-               y:{stacked:true,ticks:{color:'#64748b',font:{size:11}},grid:{color:'rgba(45,55,72,0.3)'}} }}
+    data:{labels:mLabels,datasets:[
+      {label:'当月实收',data:monthOrder.map(s=>s['当月实收']/10000),backgroundColor:'rgba(167,139,250,.75)',borderRadius:3},
+      {label:'目标(去年同月)',data:monthOrder.map(s=>s['当月目标']/10000),backgroundColor:'rgba(100,116,139,.5)',borderRadius:3,borderWidth:1,borderColor:'rgba(100,116,139,.8)'}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:11}}}},
+      scales:{x:{ticks:{color:'#64748b',font:{size:10}},grid:{color:'rgba(45,55,72,.5)'}},
+              y:{ticks:{color:'#64748b',font:{size:10},callback:v=>v.toFixed(0)+'万'},grid:{color:'rgba(45,55,72,.3)'}}}}
   });
 
-  // Chart3: 同比
-  const yoyVals = salesOrder.map(s=>s['财年同比']);
-  new Chart(document.getElementById('chartYoY').getContext('2d'), {
+  // 当月完成率
+  const compOrder = [...SS].sort((a,b)=>b['当月完成率']-a['当月完成率']);
+  const compVals = compOrder.map(s=>Number(s['当月完成率'])||0);
+  new Chart(document.getElementById('chartCompletion').getContext('2d'),{
     type:'bar',
-    data:{ labels,
-      datasets:[{
-        label:'财年同比%', data:yoyVals,
-        backgroundColor:yoyVals.map(v=>v>=0?'rgba(52,211,153,0.7)':'rgba(248,113,113,0.7)'), borderRadius:3
-      }]
-    },
-    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
-      scales:{ x:{ticks:{color:'#64748b',font:{size:11}},grid:{color:'rgba(45,55,72,0.5)'}},
-               y:{ticks:{color:'#64748b',font:{size:11},callback:v=>v+'%'},grid:{color:'rgba(45,55,72,0.3)'},
-                  border:{dash:[4,4]}} }}
+    data:{labels:compOrder.map(s=>s['拍档销售']),datasets:[{
+      label:'完成率%',data:compVals,
+      backgroundColor:compVals.map(v=>v>=100?'rgba(52,211,153,.75)':v>=70?'rgba(251,146,60,.75)':'rgba(248,113,113,.75)'),borderRadius:3
+    }]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},
+      annotation:{annotations:{line100:{type:'line',yMin:100,yMax:100,borderColor:'rgba(100,116,139,.6)',borderWidth:1,borderDash:[4,4]}}}},
+      scales:{x:{ticks:{color:'#64748b',font:{size:10}},grid:{color:'rgba(45,55,72,.5)'}},
+              y:{ticks:{color:'#64748b',font:{size:10},callback:v=>v+'%'},grid:{color:'rgba(45,55,72,.3)'}}}}
   });
 
-  // Chart4: 优品/爆品
-  new Chart(document.getElementById('chartQuality').getContext('2d'), {
+  // 优品/爆品
+  new Chart(document.getElementById('chartQuality').getContext('2d'),{
     type:'bar',
-    data:{ labels,
-      datasets:[
-        { label:'优品数', data:labels.map(n=>{ const s=SS.find(x=>x['拍档销售']===n); return s?s['优品数']:0; }), backgroundColor:'rgba(167,139,250,0.7)', borderRadius:3 },
-        { label:'爆品数', data:labels.map(n=>{ const s=SS.find(x=>x['拍档销售']===n); return s?s['爆品数']:0; }), backgroundColor:'rgba(244,114,182,0.7)', borderRadius:3 }
-      ]
-    },
-    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:11}}}},
-      scales:{ x:{ticks:{color:'#64748b',font:{size:11}},grid:{color:'rgba(45,55,72,0.5)'}},
-               y:{ticks:{color:'#64748b',font:{size:11}},grid:{color:'rgba(45,55,72,0.3)'}} }}
+    data:{labels,datasets:[
+      {label:'优品数',data:labels.map(n=>SS.find(x=>x['拍档销售']===n)?.['优品数']||0),backgroundColor:'rgba(167,139,250,.7)',borderRadius:3},
+      {label:'爆品数',data:labels.map(n=>SS.find(x=>x['拍档销售']===n)?.['爆品数']||0),backgroundColor:'rgba(244,114,182,.7)',borderRadius:3}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:11}}}},
+      scales:{x:{ticks:{color:'#64748b',font:{size:10}},grid:{color:'rgba(45,55,72,.5)'}},
+              y:{ticks:{color:'#64748b',font:{size:10}},grid:{color:'rgba(45,55,72,.3)'}}}}
   });
 
-  // Rank: 超头部TOP15
-  const superCusts = [...CUSTS].filter(c=>c['线上信保分层']==='超头部').sort((a,b)=>b['财年实收']-a['财年实收']).slice(0,15);
-  const maxSuperRev = superCusts[0]['财年实收'];
-  document.getElementById('rankSuper').innerHTML = superCusts.map((c,i)=>`
+  // 超头部TOP15 - 按当月实收
+  const superCusts=[...CUSTS].filter(c=>c['线上信保分层']==='超头部').sort((a,b)=>b['当月实收']-a['当月实收']).slice(0,15);
+  const maxSR=superCusts[0]?.['当月实收']||1;
+  document.getElementById('rankSuper').innerHTML=superCusts.map((c,i)=>`
     <div class="rank-item">
       <span class="rank-no">${i+1}</span>
       <span class="rank-name" title="${c['客户名称']}">${c['客户名称']}</span>
       <div class="rank-bar-wrap">
-        <div class="rank-bar-fill" style="width:${(c['财年实收']/maxSuperRev*100).toFixed(1)}%;background:linear-gradient(90deg,rgba(245,158,11,0.6),rgba(245,158,11,0.85))">
-          <span class="rank-bar-val" style="color:#fde68a">${(c['财年实收']/10000).toFixed(1)}万</span>
+        <div class="rank-bar-fill" style="width:${(c['当月实收']/maxSR*100).toFixed(1)}%;background:linear-gradient(90deg,rgba(245,158,11,.5),rgba(245,158,11,.85))">
+          <span class="rank-bar-val" style="color:#fde68a">${fmtW2(c['当月实收'])}</span>
         </div>
       </div>
       <span class="rank-meta">${c['拍档销售']}</span>
     </div>`).join('');
 
-  // Rank: 头部TOP10
-  const headCusts = [...CUSTS].filter(c=>c['线上信保分层']==='头部').sort((a,b)=>b['财年实收']-a['财年实收']).slice(0,10);
-  const maxHeadRev = headCusts[0]['财年实收'];
-  document.getElementById('rankHead').innerHTML = headCusts.map((c,i)=>`
+  // 头部TOP10 - 按当月实收
+  const headCusts=[...CUSTS].filter(c=>c['线上信保分层']==='头部').sort((a,b)=>b['当月实收']-a['当月实收']).slice(0,10);
+  const maxHR=headCusts[0]?.['当月实收']||1;
+  document.getElementById('rankHead').innerHTML=headCusts.map((c,i)=>`
     <div class="rank-item">
       <span class="rank-no">${i+1}</span>
       <span class="rank-name" title="${c['客户名称']}">${c['客户名称']}</span>
       <div class="rank-bar-wrap">
-        <div class="rank-bar-fill" style="width:${(c['财年实收']/maxHeadRev*100).toFixed(1)}%;background:linear-gradient(90deg,rgba(56,189,248,0.55),rgba(56,189,248,0.8))">
-          <span class="rank-bar-val" style="color:#bae6fd">${(c['财年实收']/10000).toFixed(1)}万</span>
+        <div class="rank-bar-fill" style="width:${(c['当月实收']/maxHR*100).toFixed(1)}%;background:linear-gradient(90deg,rgba(56,189,248,.5),rgba(56,189,248,.85))">
+          <span class="rank-bar-val" style="color:#bae6fd">${fmtW2(c['当月实收'])}</span>
         </div>
       </div>
       <span class="rank-meta">${c['拍档销售']}</span>
     </div>`).join('');
 }
 
-// ===================== SALES PAGE =====================
-let selectedSales = null;
-let salesLayerChart = null;
-
+// ============ 销售维度 ============
+let salesLayerChart=null;
 function buildSalesPage(){
-  const salesOrder = [...SS].sort((a,b)=>b['财年实收']-a['财年实收']);
-  const maxRev = salesOrder[0]['财年实收'];
-  const colors = ['#f59e0b','#38bdf8','#34d399','#a78bfa','#f472b6','#fb923c','#60a5fa','#4ade80'];
-  document.getElementById('salesCardGrid').innerHTML = salesOrder.map((s,i)=>`
-    <div class="sales-card" id="sc-${s['拍档销售']}" onclick="selectSales('${s['拍档销售']}')">
+  const salesOrder=[...SS].sort((a,b)=>b['财年实收']-a['财年实收']);
+  const maxRev=salesOrder[0]['财年实收'];
+  const colors=['#f59e0b','#38bdf8','#34d399','#a78bfa','#f472b6','#fb923c','#60a5fa','#4ade80'];
+  document.getElementById('salesCardGrid').innerHTML=salesOrder.map((s,i)=>{
+    const comp=Number(s['当月完成率'])||0;
+    const barW=Math.min(comp,150);
+    const barColor=comp>=100?'var(--green)':comp>=70?'var(--warn)':'var(--red)';
+    return `<div class="sales-card" id="sc-${s['拍档销售']}" onclick="selectSales('${s['拍档销售']}')">
       <div class="sc-name" style="color:${colors[i%colors.length]}">${s['拍档销售']}</div>
       <div class="sc-revenue">${(s['财年实收']/10000).toFixed(1)}<span style="font-size:13px;color:var(--text3)">万</span></div>
       <div class="sc-badges">
@@ -445,218 +430,204 @@ function buildSalesPage(){
         <span class="badge badge-head">头部×${s['头部客户数']}</span>
         ${s['拜访预警数']>0?`<span class="badge badge-warn">预警×${s['拜访预警数']}</span>`:''}
       </div>
-      <div class="sc-bar"><div class="sc-bar-fill" style="width:${(s['财年实收']/maxRev*100).toFixed(1)}%;background:${colors[i%colors.length]}"></div></div>
-      <div class="sc-mini-kpi">
-        <div class="sc-mini-item">
-          <div class="sc-mini-label">财年同比</div>
-          <div class="sc-mini-val" style="color:${pctColor(s['财年同比'])}">${pct(s['财年同比'])}</div>
-        </div>
-        <div class="sc-mini-item">
-          <div class="sc-mini-label">月均GMV</div>
-          <div class="sc-mini-val">${(s['月均GMV']/10000).toFixed(0)}万</div>
-        </div>
+      <div class="comp-bar-wrap">
+        <div class="comp-bar-label"><span>当月完成率</span><span style="color:${barColor};font-weight:500">${comp}%</span></div>
+        <div class="comp-bar-bg"><div class="comp-bar-fill" style="width:${Math.min(barW/1.5,100)}%;background:${barColor}"></div></div>
       </div>
-    </div>`).join('');
+      <div class="sc-mini-kpi">
+        <div class="sc-mini-item"><div class="sc-mini-label">财年同比</div><div class="sc-mini-val" style="color:${pctColor(s['财年同比'])}">${pct(s['财年同比'])}</div></div>
+        <div class="sc-mini-item"><div class="sc-mini-label">月均GMV</div><div class="sc-mini-val">${(s['月均GMV']/10000).toFixed(0)}万</div></div>
+      </div>
+    </div>`;}).join('');
 }
 
 function selectSales(name){
   document.querySelectorAll('.sales-card').forEach(el=>el.classList.remove('selected'));
-  document.getElementById('sc-'+name).classList.add('selected');
-  selectedSales = name;
-  updateSalesDetail(name);
-}
-
-function updateSalesDetail(name){
-  const salesData = SS.find(s=>s['拍档销售']===name);
-  const layerData = SD.filter(r=>r['拍档销售']===name);
-  const superRow = layerData.find(r=>r['线上信保分层']==='超头部');
-  const headRow  = layerData.find(r=>r['线上信保分层']==='头部');
-
-  document.getElementById('salesChartTitle1').innerHTML = `<span class="dot" style="background:var(--super)"></span>${name} · 超头部/头部收入拆分`;
-  document.getElementById('salesChartTitle2').innerHTML = `<span class="dot" style="background:var(--head)"></span>${name} · 客户列表`;
-
-  // layer chart
-  if(salesLayerChart) salesLayerChart.destroy();
-  salesLayerChart = new Chart(document.getElementById('chartSalesLayer').getContext('2d'), {
+  document.getElementById('sc-'+name)?.classList.add('selected');
+  const layerData=SD.filter(r=>r['拍档销售']===name);
+  const superRow=layerData.find(r=>r['线上信保分层']==='超头部');
+  const headRow=layerData.find(r=>r['线上信保分层']==='头部');
+  document.getElementById('salesChartTitle1').innerHTML=`<span class="dot" style="background:var(--super)"></span>${name} · 超头部/头部拆分`;
+  document.getElementById('salesChartTitle2').innerHTML=`<span class="dot" style="background:var(--head)"></span>${name} · 客户列表`;
+  if(salesLayerChart)salesLayerChart.destroy();
+  salesLayerChart=new Chart(document.getElementById('chartSalesLayer').getContext('2d'),{
     type:'bar',
-    data:{ labels:['超头部','头部'],
-      datasets:[
-        { label:'财年实收(万)', data:[superRow?superRow['财年实收']/10000:0, headRow?headRow['财年实收']/10000:0],
-          backgroundColor:['rgba(245,158,11,0.75)','rgba(56,189,248,0.65)'], borderRadius:4 },
-        { label:'客户数', data:[superRow?superRow['客户数']:0, headRow?headRow['客户数']:0],
-          backgroundColor:['rgba(245,158,11,0.35)','rgba(56,189,248,0.35)'], borderRadius:4, yAxisID:'y2' }
-      ]
-    },
-    options:{ responsive:true, maintainAspectRatio:false,
-      plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:11}}}},
-      scales:{
-        x:{ticks:{color:'#94a3b8',font:{size:12}},grid:{color:'rgba(45,55,72,0.4)'}},
-        y:{ticks:{color:'#64748b',font:{size:11},callback:v=>v.toFixed(0)+'万'},grid:{color:'rgba(45,55,72,0.3)'}},
-        y2:{position:'right',ticks:{color:'#64748b',font:{size:11}},grid:{display:false},title:{display:true,text:'客户数',color:'#64748b',font:{size:11}}}
-      }}
+    data:{labels:['超头部','头部'],datasets:[
+      {label:'财年实收(万)',data:[superRow?superRow['财年实收']/10000:0,headRow?headRow['财年实收']/10000:0],backgroundColor:['rgba(245,158,11,.75)','rgba(56,189,248,.65)'],borderRadius:4},
+      {label:'当月实收(万)',data:[superRow?superRow['当月实收']/10000:0,headRow?headRow['当月实收']/10000:0],backgroundColor:['rgba(245,158,11,.4)','rgba(56,189,248,.35)'],borderRadius:4,yAxisID:'y2'},
+      {label:'当月目标(万)',data:[superRow?superRow['当月目标']/10000:0,headRow?headRow['当月目标']/10000:0],backgroundColor:['rgba(100,116,139,.4)','rgba(100,116,139,.35)'],borderRadius:4,yAxisID:'y2'}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:10}}}},
+      scales:{x:{ticks:{color:'#94a3b8'},grid:{color:'rgba(45,55,72,.4)'}},
+              y:{ticks:{color:'#64748b',font:{size:10},callback:v=>v.toFixed(0)+'万'},grid:{color:'rgba(45,55,72,.3)'}},
+              y2:{position:'right',ticks:{color:'#64748b',font:{size:10},callback:v=>v.toFixed(0)+'万'},grid:{display:false}}}}
   });
-
-  // customer list
-  const myCusts = [...CUSTS].filter(c=>c['拍档销售']===name).sort((a,b)=>b['财年实收']-a['财年实收']);
-  document.getElementById('salesCustList').innerHTML = `
+  const myCusts=[...CUSTS].filter(c=>c['拍档销售']===name).sort((a,b)=>b['当月实收']-a['当月实收']);
+  document.getElementById('salesCustList').innerHTML=`
     <table style="width:100%;border-collapse:collapse;font-size:11px">
       <thead><tr style="background:var(--bg2)">
-        <th style="padding:6px 10px;text-align:left;color:var(--text3);border-bottom:1px solid var(--border)">客户名称</th>
-        <th style="padding:6px 10px;text-align:left;color:var(--text3);border-bottom:1px solid var(--border)">层级</th>
-        <th style="padding:6px 10px;text-align:right;color:var(--text3);border-bottom:1px solid var(--border)">财年实收</th>
-        <th style="padding:6px 10px;text-align:right;color:var(--text3);border-bottom:1px solid var(--border)">同比</th>
-        <th style="padding:6px 10px;text-align:center;color:var(--text3);border-bottom:1px solid var(--border)">合作意愿</th>
-        <th style="padding:6px 10px;text-align:center;color:var(--text3);border-bottom:1px solid var(--border)">拜访风险</th>
+        <th style="padding:6px 8px;color:var(--text3);border-bottom:1px solid var(--border)">客户名称</th>
+        <th style="padding:6px 8px;color:var(--text3);border-bottom:1px solid var(--border)">层级</th>
+        <th style="padding:6px 8px;text-align:right;color:var(--text3);border-bottom:1px solid var(--border)">当月实收</th>
+        <th style="padding:6px 8px;text-align:right;color:var(--text3);border-bottom:1px solid var(--border)">目标</th>
+        <th style="padding:6px 8px;text-align:right;color:var(--text3);border-bottom:1px solid var(--border)">完成率</th>
+        <th style="padding:6px 8px;text-align:right;color:var(--text3);border-bottom:1px solid var(--border)">同比</th>
+        <th style="padding:6px 8px;text-align:center;color:var(--text3);border-bottom:1px solid var(--border)">拜访风险</th>
       </tr></thead>
-      <tbody>
-        ${myCusts.map(c=>`<tr style="border-bottom:1px solid rgba(45,55,72,0.4)">
-          <td style="padding:6px 10px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${c['客户名称']}">${c['客户名称']}</td>
-          <td style="padding:6px 10px"><span class="badge ${c['线上信保分层']==='超头部'?'badge-super':'badge-head'}">${c['线上信保分层']}</span></td>
-          <td style="padding:6px 10px;text-align:right;color:var(--text)">${fmtW(c['财年实收'])}</td>
-          <td style="padding:6px 10px;text-align:right;color:${pctColor(c['财年同比'])}">${pct(c['财年同比'])}</td>
-          <td style="padding:6px 10px;text-align:center"><span class="badge ${c['合作意愿度']==='高'?'badge-ok':'badge-mid'}">${c['合作意愿度']}</span></td>
-          <td style="padding:6px 10px;text-align:center"><span class="badge ${c['拜访风险']==='高风险'?'badge-warn':c['拜访风险']==='中风险'?'badge-mid':'badge-ok'}">${c['拜访风险']}</span></td>
-        </tr>`).join('')}
-      </tbody>
+      <tbody>${myCusts.map(c=>`<tr style="border-bottom:1px solid rgba(45,55,72,.4)">
+        <td style="padding:6px 8px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${c['客户名称']}">${c['客户名称']}</td>
+        <td style="padding:6px 8px"><span class="badge ${c['线上信保分层']==='超头部'?'badge-super':'badge-head'}">${c['线上信保分层']}</span></td>
+        <td style="padding:6px 8px;text-align:right">${fmtW(c['当月实收'])}</td>
+        <td style="padding:6px 8px;text-align:right;color:var(--text3)">${fmtW(c['目标'])}</td>
+        <td style="padding:6px 8px;text-align:right;color:${compColor(c['当月完成率'])}">${c['当月完成率']!==0?c['当月完成率']+'%':'-'}</td>
+        <td style="padding:6px 8px;text-align:right;color:${pctColor(c['当月同比'])}">${pct(c['当月同比'])}</td>
+        <td style="padding:6px 8px;text-align:center"><span class="badge ${c['拜访风险']==='高风险'?'badge-warn':c['拜访风险']==='中风险'?'badge-mid':'badge-ok'}">${c['拜访风险']}</span></td>
+      </tr>`).join('')}</tbody>
     </table>`;
 }
 
-// ===================== DETAIL PAGE =====================
-let detailFilter = 'all';
-let detailSearch = '';
-let detailPage = 1;
-const PAGE_SIZE = 20;
-
+// ============ 明细 ============
+let detailFilter='all',detailSearch='',detailPage=1;
+const PAGE_SIZE=20;
 function getFilteredCusts(){
   return CUSTS.filter(c=>{
-    if(detailFilter!=='all' && c['线上信保分层']!==detailFilter) return false;
-    if(detailSearch && !c['客户名称'].includes(detailSearch) && !c['拍档销售'].includes(detailSearch)) return false;
+    if(detailFilter!=='all'&&c['线上信保分层']!==detailFilter)return false;
+    if(detailSearch&&!c['客户名称'].includes(detailSearch)&&!c['拍档销售'].includes(detailSearch))return false;
     return true;
-  }).sort((a,b)=>b['财年实收']-a['财年实收']);
+  }).sort((a,b)=>b['当月实收']-a['当月实收']);
 }
-
 function renderDetail(){
-  const data = getFilteredCusts();
-  const total = data.length;
-  const totalPages = Math.ceil(total/PAGE_SIZE);
-  if(detailPage > totalPages) detailPage = 1;
-  const slice = data.slice((detailPage-1)*PAGE_SIZE, detailPage*PAGE_SIZE);
-
-  document.getElementById('detailTbody').innerHTML = slice.map((c,i)=>`<tr>
+  const data=getFilteredCusts();
+  const total=data.length,totalPages=Math.max(1,Math.ceil(total/PAGE_SIZE));
+  if(detailPage>totalPages)detailPage=1;
+  const slice=data.slice((detailPage-1)*PAGE_SIZE,detailPage*PAGE_SIZE);
+  document.getElementById('detailTbody').innerHTML=slice.map((c,i)=>`<tr>
     <td style="color:var(--text3)">${(detailPage-1)*PAGE_SIZE+i+1}</td>
-    <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${c['客户名称']}">${c['客户名称']}</td>
+    <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${c['客户名称']}">${c['客户名称']}</td>
     <td>${c['拍档销售']}</td>
     <td><span class="badge ${c['线上信保分层']==='超头部'?'badge-super':'badge-head'}">${c['线上信保分层']}</span></td>
-    <td style="text-align:right">${fmtW(c['财年实收'])}</td>
-    <td style="text-align:right;color:var(--text3)">${fmtW(c['上财年同期实收'])}</td>
-    <td style="text-align:right;color:${pctColor(c['财年同比'])}">${pct(c['财年同比'])}</td>
     <td style="text-align:right">${fmtW(c['当月实收'])}</td>
-    <td style="text-align:right;color:var(--text3)">${fmtW(c['近6个月月均GMV'])}</td>
+    <td style="text-align:right;color:var(--text3)">${fmtW(c['目标'])}</td>
+    <td style="text-align:right;color:${compColor(c['当月完成率'])}">${c['当月完成率']!==0?c['当月完成率']+'%':'-'}</td>
+    <td style="text-align:right;color:${pctColor(c['当月同比'])}">${pct(c['当月同比'])}</td>
+    <td style="text-align:right">${fmtW2(c['财年实收'])}</td>
+    <td style="text-align:right;color:${pctColor(c['财年同比'])}">${pct(c['财年同比'])}</td>
+    <td style="text-align:right;color:var(--text3)">${fmtW2(c['近6个月月均GMV'])}</td>
     <td style="text-align:right">${c['优品数']||'-'}</td>
     <td style="text-align:right">${c['爆品数']||'-'}</td>
     <td><span class="badge ${c['合作意愿度']==='高'?'badge-ok':'badge-mid'}">${c['合作意愿度']}</span></td>
-    <td><span class="badge ${c['是否实收预警']==='Y'?'badge-warn':'badge-ok'}">${c['是否实收预警']==='Y'?'预警':'正常'}</span></td>
     <td><span class="badge ${c['拜访风险']==='高风险'?'badge-warn':c['拜访风险']==='中风险'?'badge-mid':'badge-ok'}">${c['拜访风险']}</span></td>
     <td style="color:var(--text3);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c['一级行业描述']||'-'}</td>
   </tr>`).join('');
-
-  // pagination
-  let pgHtml = `<span class="page-info">共 ${total} 条 / 第 ${detailPage}/${totalPages} 页</span>`;
-  if(detailPage>1) pgHtml += `<button class="page-btn" onclick="goPg(${detailPage-1})">上一页</button>`;
-  const start = Math.max(1,detailPage-2), end = Math.min(totalPages,detailPage+2);
-  for(let p=start;p<=end;p++) pgHtml += `<button class="page-btn${p===detailPage?' active-pg':''}" onclick="goPg(${p})">${p}</button>`;
-  if(detailPage<totalPages) pgHtml += `<button class="page-btn" onclick="goPg(${detailPage+1})">下一页</button>`;
-  document.getElementById('paginationBar').innerHTML = pgHtml;
+  let pgHtml=`<span class="page-info">共 ${total} 条 / 第 ${detailPage}/${totalPages} 页</span>`;
+  if(detailPage>1)pgHtml+=`<button class="page-btn" onclick="goPg(${detailPage-1})">上一页</button>`;
+  const s2=Math.max(1,detailPage-2),e2=Math.min(totalPages,detailPage+2);
+  for(let p=s2;p<=e2;p++)pgHtml+=`<button class="page-btn${p===detailPage?' active-pg':''}" onclick="goPg(${p})">${p}</button>`;
+  if(detailPage<totalPages)pgHtml+=`<button class="page-btn" onclick="goPg(${detailPage+1})">下一页</button>`;
+  document.getElementById('paginationBar').innerHTML=pgHtml;
 }
+function goPg(p){detailPage=p;renderDetail()}
+function filterDetail(type,btn){detailFilter=type;detailPage=1;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderDetail()}
+function searchDetail(){detailSearch=document.getElementById('searchInput').value;detailPage=1;renderDetail()}
 
-function goPg(p){ detailPage=p; renderDetail(); }
-function filterDetail(type, btn){
-  detailFilter=type; detailPage=1;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  renderDetail();
-}
-function searchDetail(){ detailSearch=document.getElementById('searchInput').value; detailPage=1; renderDetail(); }
-
-// ===================== RISK PAGE =====================
+// ============ 预警 ============
 function buildRiskPage(){
-  const riskHigh = [...CUSTS].filter(c=>c['近一次有效拜访距今天数']>60).sort((a,b)=>b['财年实收']-a['财年实收']);
-  const riskMid  = [...CUSTS].filter(c=>c['近一次有效拜访距今天数']>30 && c['近一次有效拜访距今天数']<=60).sort((a,b)=>b['财年实收']-a['财年实收']);
-  const riskRev  = [...CUSTS].filter(c=>c['是否实收预警']==='Y');
-  const riskLow  = [...CUSTS].filter(c=>c['合作意愿度']!=='高').sort((a,b)=>b['财年实收']-a['财年实收']);
+  const riskHigh=CUSTS.filter(c=>Number(c['近一次有效拜访距今天数'])>60).sort((a,b)=>b['财年实收']-a['财年实收']);
+  const riskMid=CUSTS.filter(c=>Number(c['近一次有效拜访距今天数'])>30&&Number(c['近一次有效拜访距今天数'])<=60).sort((a,b)=>b['财年实收']-a['财年实收']);
+  const riskLow=CUSTS.filter(c=>c['合作意愿度']!=='高').sort((a,b)=>b['财年实收']-a['财年实收']);
+  const totalMonthRev=SS.reduce((a,s)=>a+s['当月实收'],0);
+  const totalMonthTarget=SS.reduce((a,s)=>a+s['当月目标'],0);
+  const overallComp=totalMonthTarget>0?(totalMonthRev/totalMonthTarget*100):0;
 
-  document.getElementById('kpi-risk').innerHTML = `
-    <div class="kpi-card" style="border-color:rgba(248,113,113,0.4);background:linear-gradient(135deg,var(--card),var(--red-bg))">
-      <div class="kpi-label">高风险客户</div>
+  document.getElementById('kpi-risk').innerHTML=`
+    <div class="kpi-card red-card">
+      <div class="kpi-label">当月实收下滑>20%</div>
+      <div class="kpi-val red">${DROP20.length}</div>
+      <div class="kpi-sub">累计缺口 ${fmtW2(DROP20.reduce((a,c)=>a+(Number(c['目标'])-Number(c['当月实收'])),0))}</div>
+    </div>
+    <div class="kpi-card" style="border-color:rgba(248,113,113,.4);background:linear-gradient(135deg,var(--card),var(--red-bg))">
+      <div class="kpi-label">拜访高风险</div>
       <div class="kpi-val red">${riskHigh.length}</div>
       <div class="kpi-sub">有效拜访 >60天</div>
     </div>
-    <div class="kpi-card" style="border-color:rgba(251,146,60,0.4);background:linear-gradient(135deg,var(--card),var(--warn-bg))">
-      <div class="kpi-label">中风险客户</div>
+    <div class="kpi-card warn-card">
+      <div class="kpi-label">拜访中风险</div>
       <div class="kpi-val warn-val">${riskMid.length}</div>
-      <div class="kpi-sub">有效拜访 30-60天</div>
+      <div class="kpi-sub">30-60天</div>
     </div>
-    <div class="kpi-card" style="border-color:rgba(248,113,113,0.4);background:linear-gradient(135deg,var(--card),var(--red-bg))">
-      <div class="kpi-label">实收预警客户</div>
-      <div class="kpi-val red">${riskRev.length}</div>
-      <div class="kpi-sub">近半年月均偏低</div>
-    </div>
-    <div class="kpi-card" style="border-color:rgba(245,158,11,0.3)">
-      <div class="kpi-label">合作意愿偏低</div>
-      <div class="kpi-val super-val">${riskLow.length}</div>
-      <div class="kpi-sub">需重点维护</div>
+    <div class="kpi-card" style="border-color:rgba(167,139,250,.4);background:linear-gradient(135deg,var(--card),rgba(167,139,250,.08))">
+      <div class="kpi-label">当月整体完成率</div>
+      <div class="kpi-val" style="color:${compColor(overallComp)}">${overallComp.toFixed(1)}%</div>
+      <div class="kpi-sub">实收 ${fmtW2(totalMonthRev)} / 目标 ${fmtW2(totalMonthTarget)}</div>
     </div>
   `;
 
-  const riskItem = (c, dotColor) => `
+  // 下滑>20%
+  document.getElementById('drop20-cnt').textContent=DROP20.length;
+  document.getElementById('riskDrop20').innerHTML=DROP20.map(c=>`
     <div class="risk-item">
-      <div class="risk-dot" style="background:${dotColor}"></div>
+      <div class="risk-dot" style="background:${Number(c['当月同比'])<-60?'var(--red)':'var(--warn)'}"></div>
       <div class="risk-content">
         <div class="risk-cname">${c['客户名称']}</div>
-        <div class="risk-meta">${c['拍档销售']} · <span class="badge ${c['线上信保分层']==='超头部'?'badge-super':'badge-head'}" style="font-size:9px">${c['线上信保分层']}</span> · 财年实收 ${fmtW(c['财年实收'])} · 拜访 ${c['近一次有效拜访距今天数']}天前</div>
+        <div class="risk-meta">${c['拍档销售']} · <span class="badge ${c['线上信保分层']==='超头部'?'badge-super':'badge-head'}" style="font-size:9px">${c['线上信保分层']}</span> · 实收 ${fmtW(c['当月实收'])} / 目标 ${fmtW(c['目标'])}</div>
       </div>
-    </div>`;
-  const riskRevItem = (c) => `
-    <div class="risk-item">
-      <div class="risk-dot" style="background:var(--red)"></div>
-      <div class="risk-content">
-        <div class="risk-cname">${c['客户名称']}</div>
-        <div class="risk-meta">${c['拍档销售']} · 财年实收 ${fmtW(c['财年实收'])} · 当月 ${fmtW(c['当月实收'])}</div>
-      </div>
-    </div>`;
-  const lowItem = (c) => `
-    <div class="risk-item">
-      <div class="risk-dot" style="background:var(--super)"></div>
-      <div class="risk-content">
-        <div class="risk-cname">${c['客户名称']}</div>
-        <div class="risk-meta">${c['拍档销售']} · <span class="badge ${c['线上信保分层']==='超头部'?'badge-super':'badge-head'}" style="font-size:9px">${c['线上信保分层']}</span> · 意愿: ${c['合作意愿度']} · 财年 ${fmtW(c['财年实收'])}</div>
-      </div>
-    </div>`;
+      <div class="risk-pct">${pct(c['当月同比'])}</div>
+    </div>`).join('');
 
-  document.getElementById('riskHigh').innerHTML = riskHigh.map(c=>riskItem(c,'var(--red)')).join('') || '<div style="padding:16px;color:var(--text3);font-size:12px">暂无高风险客户</div>';
-  document.getElementById('riskMid').innerHTML  = riskMid.map(c=>riskItem(c,'var(--warn)')).join('') || '<div style="padding:16px;color:var(--text3);font-size:12px">暂无中风险客户</div>';
-  document.getElementById('riskRev').innerHTML  = riskRev.map(c=>riskRevItem(c)).join('') || '<div style="padding:16px;color:var(--text3);font-size:12px">暂无实收预警客户</div>';
-  document.getElementById('riskLowIntent').innerHTML = riskLow.map(c=>lowItem(c)).join('') || '<div style="padding:16px;color:var(--text3);font-size:12px">全部客户合作意愿较高</div>';
+  // 拜访风险
+  const riItem=(c,dc)=>`<div class="risk-item">
+    <div class="risk-dot" style="background:${dc}"></div>
+    <div class="risk-content">
+      <div class="risk-cname">${c['客户名称']}</div>
+      <div class="risk-meta">${c['拍档销售']} · <span class="badge ${c['线上信保分层']==='超头部'?'badge-super':'badge-head'}" style="font-size:9px">${c['线上信保分层']}</span> · ${c['近一次有效拜访距今天数']}天前</div>
+    </div></div>`;
+  document.getElementById('riskHigh').innerHTML=riskHigh.map(c=>riItem(c,'var(--red)')).join('')||'<div style="padding:14px;color:var(--text3);font-size:12px">暂无</div>';
+  document.getElementById('riskMid').innerHTML=riskMid.map(c=>riItem(c,'var(--warn)')).join('')||'<div style="padding:14px;color:var(--text3);font-size:12px">暂无</div>';
+  document.getElementById('riskLowIntent').innerHTML=riskLow.map(c=>`<div class="risk-item">
+    <div class="risk-dot" style="background:var(--super)"></div>
+    <div class="risk-content">
+      <div class="risk-cname">${c['客户名称']}</div>
+      <div class="risk-meta">${c['拍档销售']} · <span class="badge ${c['线上信保分层']==='超头部'?'badge-super':'badge-head'}" style="font-size:9px">${c['线上信保分层']}</span> · 意愿: ${c['合作意愿度']} · ${fmtW2(c['财年实收'])}</div>
+    </div></div>`).join('')||'<div style="padding:14px;color:var(--text3);font-size:12px">全部高意愿</div>';
+
+  // 各销售完成率表
+  const compRows=[...SS].sort((a,b)=>b['当月完成率']-a['当月完成率']);
+  document.getElementById('riskCompTable').innerHTML=`
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead><tr style="background:var(--bg2)">
+        <th style="padding:8px 12px;color:var(--text3);border-bottom:1px solid var(--border)">销售</th>
+        <th style="padding:8px 12px;text-align:right;color:var(--text3);border-bottom:1px solid var(--border)">当月实收</th>
+        <th style="padding:8px 12px;text-align:right;color:var(--text3);border-bottom:1px solid var(--border)">目标</th>
+        <th style="padding:8px 12px;text-align:right;color:var(--text3);border-bottom:1px solid var(--border)">完成率</th>
+        <th style="padding:8px 12px;text-align:right;color:var(--text3);border-bottom:1px solid var(--border)">缺口</th>
+      </tr></thead>
+      <tbody>${compRows.map(s=>{
+        const gap=s['当月目标']-s['当月实收'];
+        const comp=Number(s['当月完成率'])||0;
+        return `<tr style="border-bottom:1px solid rgba(45,55,72,.4)">
+          <td style="padding:8px 12px">${s['拍档销售']}</td>
+          <td style="padding:8px 12px;text-align:right">${fmtW2(s['当月实收'])}</td>
+          <td style="padding:8px 12px;text-align:right;color:var(--text3)">${fmtW2(s['当月目标'])}</td>
+          <td style="padding:8px 12px;text-align:right;color:${compColor(comp)};font-weight:500">${comp}%</td>
+          <td style="padding:8px 12px;text-align:right;color:${gap>0?'var(--red)':'var(--green)'}">${gap>0?'-':'+'}${fmtW2(Math.abs(gap))}</td>
+        </tr>`;}).join('')}</tbody>
+    </table>`;
 }
 
-// ===================== TAB SWITCH =====================
-let salesPageBuilt = false, detailPageBuilt = false, riskPageBuilt = false;
+// ============ TAB ============
+let salesBuilt=false,detailBuilt=false,riskBuilt=false;
 function switchTab(tab){
   document.querySelectorAll('.tab').forEach((t,i)=>{
-    const tabs=['overview','sales','detail','risk'];
-    t.classList.toggle('active', tabs[i]===tab);
+    t.classList.toggle('active',['overview','sales','detail','risk'][i]===tab);
   });
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+tab).classList.add('active');
-  if(tab==='sales' && !salesPageBuilt){ buildSalesPage(); salesPageBuilt=true; }
-  if(tab==='detail' && !detailPageBuilt){ renderDetail(); detailPageBuilt=true; }
-  if(tab==='risk' && !riskPageBuilt){ buildRiskPage(); riskPageBuilt=true; }
+  if(tab==='sales'&&!salesBuilt){buildSalesPage();salesBuilt=true}
+  if(tab==='detail'&&!detailBuilt){renderDetail();detailBuilt=true}
+  if(tab==='risk'&&!riskBuilt){buildRiskPage();riskBuilt=true}
 }
 
-// ===================== INIT =====================
-document.addEventListener('DOMContentLoaded', ()=>{
-  buildOverview();
-});
+document.addEventListener('DOMContentLoaded',buildOverview);
 </script>
 </body>
 </html>
