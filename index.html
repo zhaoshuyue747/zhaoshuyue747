@@ -113,11 +113,16 @@ tbody tr:last-child td{border-bottom:none}
 .sc-mini-label{font-size:10px;color:var(--text3)}
 .sc-mini-val{font-size:12px;font-weight:500;color:var(--text)}
 
-/* completion bar */
+/* completion bar — sales card */
 .comp-bar-wrap{margin-top:8px}
 .comp-bar-label{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:3px}
 .comp-bar-bg{height:6px;border-radius:3px;background:var(--border)}
 .comp-bar-fill{height:100%;border-radius:3px;transition:width .6s ease}
+/* inline progress bar — table cell */
+.td-prog{display:flex;align-items:center;gap:6px;min-width:100px}
+.td-prog-bg{flex:1;height:6px;border-radius:3px;background:var(--border);overflow:hidden}
+.td-prog-fill{height:100%;border-radius:3px}
+.td-prog-txt{font-size:11px;font-weight:500;white-space:nowrap;min-width:38px;text-align:right}
 
 /* risk */
 .risk-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -284,6 +289,18 @@ function fmtW2(n){if(!n&&n!==0)return'-';const v=Number(n);if(isNaN(v))return'-'
 function pct(v){if(v===0||v===null||v===undefined||isNaN(v))return'-';return(v>0?'+':'')+Number(v).toFixed(1)+'%'}
 function pctColor(v){const n=Number(v);return n>0?'var(--green)':n<0?'var(--red)':'var(--text3)'}
 function compColor(v){const n=Number(v);if(isNaN(n))return'var(--text3)';return n>=100?'var(--green)':n>=70?'var(--warn)':'var(--red)'}
+// 内联进度条：bar填充宽度上限100%，数值原样显示
+function compBar(v){
+  const n=Number(v);
+  if(!v&&v!==0||isNaN(n))return'<span style="color:var(--text3)">-</span>';
+  const color=compColor(n);
+  const fillW=Math.min(n,100).toFixed(1);
+  const label=n>=100?n.toFixed(0)+'%':n.toFixed(1)+'%';
+  return `<div class="td-prog">
+    <div class="td-prog-bg"><div class="td-prog-fill" style="width:${fillW}%;background:${color}"></div></div>
+    <span class="td-prog-txt" style="color:${color}">${label}</span>
+  </div>`;
+}
 
 // ============ 总览 ============
 function buildOverview(){
@@ -479,7 +496,7 @@ function selectSales(name){
         <td style="padding:6px 8px"><span class="badge ${c['线上信保分层']==='超头部'?'badge-super':'badge-head'}">${c['线上信保分层']}</span></td>
         <td style="padding:6px 8px;text-align:right">${fmtW(c['当月实收'])}</td>
         <td style="padding:6px 8px;text-align:right;color:var(--text3)">${fmtW(c['目标'])}</td>
-        <td style="padding:6px 8px;text-align:right;color:${compColor(c['当月完成率'])}">${c['当月完成率']!==0?c['当月完成率']+'%':'-'}</td>
+        <td style="padding:4px 8px">${compBar(c['当月完成率'])}</td>
         <td style="padding:6px 8px;text-align:right;color:${pctColor(c['当月同比'])}">${pct(c['当月同比'])}</td>
         <td style="padding:6px 8px;text-align:center"><span class="badge ${c['拜访风险']==='高风险'?'badge-warn':c['拜访风险']==='中风险'?'badge-mid':'badge-ok'}">${c['拜访风险']}</span></td>
       </tr>`).join('')}</tbody>
@@ -508,7 +525,7 @@ function renderDetail(){
     <td><span class="badge ${c['线上信保分层']==='超头部'?'badge-super':'badge-head'}">${c['线上信保分层']}</span></td>
     <td style="text-align:right">${fmtW(c['当月实收'])}</td>
     <td style="text-align:right;color:var(--text3)">${fmtW(c['目标'])}</td>
-    <td style="text-align:right;color:${compColor(c['当月完成率'])}">${c['当月完成率']!==0?c['当月完成率']+'%':'-'}</td>
+    <td style="padding:4px 10px">${compBar(c['当月完成率'])}</td>
     <td style="text-align:right;color:${pctColor(c['当月同比'])}">${pct(c['当月同比'])}</td>
     <td style="text-align:right">${fmtW2(c['财年实收'])}</td>
     <td style="text-align:right;color:${pctColor(c['财年同比'])}">${pct(c['财年同比'])}</td>
