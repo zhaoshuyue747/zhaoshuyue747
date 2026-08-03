@@ -254,6 +254,40 @@ tbody tr:last-child td{border-bottom:none}
 <!-- ======= 预警分析 ======= -->
 <div class="page" id="page-risk">
   <div class="kpi-row kpi-4" id="kpi-risk"></div>
+
+  <!-- 强开预警客户独立板块 -->
+  <div class="table-card" style="margin-bottom:20px">
+    <div class="table-header-row" style="padding-bottom:6px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:15px;font-weight:600;color:#fb923c">⚡ 强开预警客户</span>
+        <span style="font-size:11px;color:var(--text3)">数据来源：拍档系统 · 客户管理 → 公海私海客户</span>
+        <span id="qkBadge" style="background:rgba(251,146,60,.15);color:var(--warn);border:1px solid rgba(251,146,60,.4);padding:2px 10px;border-radius:10px;font-size:11px;font-weight:500"></span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span style="font-size:11px;color:var(--text3)">抓取时间：<b id="qkFetchTime" style="color:var(--text2)">—</b></span>
+        <input id="qkSearch" placeholder="搜索客户/销售" style="padding:4px 10px;border-radius:16px;border:1px solid var(--border);background:transparent;color:var(--text);font-size:11px;width:120px;outline:none" oninput="filterQK()">
+        <select id="qkSalesFilter" onchange="filterQK()" style="padding:4px 8px;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--text2);font-size:11px;outline:none">
+          <option value="">全部销售</option>
+        </select>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table id="qkTable">
+        <thead><tr>
+          <th style="width:28px">#</th>
+          <th>客户名称</th>
+          <th>拍档销售</th>
+          <th>强开预警时间</th>
+          <th>距今天数</th>
+          <th>紧迫程度</th>
+        </tr></thead>
+        <tbody id="qkTbody"></tbody>
+      </table>
+    </div>
+    <!-- 销售维度汇总 -->
+    <div id="qkSalesSummary" style="display:flex;gap:10px;flex-wrap:wrap;padding:10px 16px 12px;border-top:1px solid var(--border);margin-top:4px"></div>
+  </div>
+
   <div class="risk-grid">
     <div class="table-card">
       <div class="risk-section-title" style="color:var(--red)">📉 当月实收下滑超20%（共 <span id="drop20-cnt">0</span> 个客户）</div>
@@ -631,6 +665,99 @@ function buildRiskPage(){
     </table>`;
 }
 
+// ============ 强开预警 ============
+const QK_DATA = [
+  {"客户名称":"东莞市艾斯瑞仪器有限公司","拍档销售":"欧阳杰俊","强开预警时间":"2026-08-01 16:53"},
+  {"客户名称":"东莞市深莞智能卫浴科技有限公司","拍档销售":"欧阳杰俊","强开预警时间":"2026-08-02 15:08"},
+  {"客户名称":"东莞市冠梦电子科技有限公司","拍档销售":"高盛强","强开预警时间":"2026-08-12 18:36"},
+  {"客户名称":"东莞勤始科技有限公司","拍档销售":"燕磊","强开预警时间":"2026-08-12 00:00"},
+  {"客户名称":"东莞市世祥精密模具有限公司","拍档销售":"燕磊","强开预警时间":"2026-08-12 00:00"},
+  {"客户名称":"东莞市弘华电线电缆有限公司","拍档销售":"赵舒越","强开预警时间":"2026-08-13 16:13"},
+  {"客户名称":"东莞市鸿图晟科技有限公司","拍档销售":"欧阳杰俊","强开预警时间":"2026-08-14 23:06"},
+  {"客户名称":"东莞市杰思特文具有限公司","拍档销售":"欧阳杰俊","强开预警时间":"2026-08-16 21:31"},
+  {"客户名称":"广东叁通铝业有限公司","拍档销售":"高盛强","强开预警时间":"2026-08-16 13:00"},
+  {"客户名称":"东莞市和鑫运动器材制品有限公司","拍档销售":"欧阳杰俊","强开预警时间":"2026-08-16 21:32"},
+  {"客户名称":"东莞市长安铂开五金制品厂(个体工商户)","拍档销售":"欧阳杰俊","强开预警时间":"2026-08-16 21:30"},
+  {"客户名称":"东莞市君润科技实业有限公司","拍档销售":"欧阳杰俊","强开预警时间":"2026-08-05 16:24"},
+  {"客户名称":"东莞市稳通电子科技有限公司","拍档销售":"未知","强开预警时间":"2026-08-06 12:06"},
+  {"客户名称":"东莞市邦博电子科技有限公司","拍档销售":"欧阳杰俊","强开预警时间":"2026-08-06 18:58"},
+  {"客户名称":"东人莞亿佳升亚克力科技有限公司","拍档销售":"燕磊","强开预警时间":"2026-08-07 21:23"},
+  {"客户名称":"东莞市廉基实业投资有限公司","拍档销售":"燕磊","强开预警时间":"2026-08-07 21:25"},
+  {"客户名称":"东莞东晟装备科技有限公司","拍档销售":"刘鑫","强开预警时间":"2026-08-08 22:34"},
+  {"客户名称":"广东楷诚纸业有限公司","拍档销售":"欧阳杰俊","强开预警时间":"2026-08-10 22:12"},
+  {"客户名称":"广东楷诚纸业有限公司","拍档销售":"欧阳杰俊","强开预警时间":"2026-08-10 22:11"}
+];
+const QK_FETCH_TIME = "2026-08-03 今日抓取";
+
+let qkFilter = '';
+let qkSales = '';
+
+function daysAgo(dtStr){
+  const d = new Date(dtStr.replace(' ','T'));
+  if(isNaN(d)) return null;
+  return Math.floor((Date.now() - d.getTime()) / 86400000);
+}
+
+function urgencyBadge(days){
+  if(days === null) return '<span class="badge" style="background:rgba(100,116,139,.15);color:var(--text3)">-</span>';
+  if(days <= 3)  return `<span class="badge badge-warn">紧急 ${days}天</span>`;
+  if(days <= 7)  return `<span class="badge badge-mid">关注 ${days}天</span>`;
+  return `<span class="badge badge-ok">正常 ${days}天</span>`;
+}
+
+function buildQKSection(){
+  document.getElementById('qkFetchTime').textContent = QK_FETCH_TIME;
+  document.getElementById('qkBadge').textContent = `共 ${QK_DATA.length} 条`;
+
+  // 销售筛选下拉
+  const sales = [...new Set(QK_DATA.map(r=>r['拍档销售']))].sort();
+  const sel = document.getElementById('qkSalesFilter');
+  sales.forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; sel.appendChild(o); });
+
+  renderQK();
+  renderQKSummary();
+}
+
+function filterQK(){
+  qkFilter = document.getElementById('qkSearch').value.trim();
+  qkSales  = document.getElementById('qkSalesFilter').value;
+  renderQK();
+}
+
+function renderQK(){
+  const data = QK_DATA.filter(r=>{
+    if(qkSales && r['拍档销售'] !== qkSales) return false;
+    if(qkFilter && !r['客户名称'].includes(qkFilter) && !r['拍档销售'].includes(qkFilter)) return false;
+    return true;
+  }).sort((a,b)=> new Date(a['强开预警时间']) - new Date(b['强开预警时间']));
+
+  document.getElementById('qkTbody').innerHTML = data.map((r,i)=>{
+    const days = daysAgo(r['强开预警时间']);
+    return `<tr>
+      <td style="color:var(--text3)">${i+1}</td>
+      <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r['客户名称']}">${r['客户名称']}</td>
+      <td>${r['拍档销售']}</td>
+      <td style="color:var(--text2)">${r['强开预警时间']}</td>
+      <td style="text-align:center;color:${days!==null&&days<=3?'var(--red)':days<=7?'var(--warn)':'var(--text3)'}">${days!==null?days+'天':'-'}</td>
+      <td>${urgencyBadge(days)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderQKSummary(){
+  const map = {};
+  QK_DATA.forEach(r=>{ map[r['拍档销售']] = (map[r['拍档销售']]||0)+1; });
+  const sorted = Object.entries(map).sort((a,b)=>b[1]-a[1]);
+  const colors = {'欧阳杰俊':'var(--red)','燕磊':'var(--warn)','高盛强':'var(--super)','刘鑫':'var(--head)','赵舒越':'var(--green)'};
+  document.getElementById('qkSalesSummary').innerHTML = sorted.map(([name,cnt])=>`
+    <div style="display:flex;align-items:center;gap:6px;background:var(--bg3);border-radius:8px;padding:5px 12px;border:1px solid var(--border)">
+      <span style="width:8px;height:8px;border-radius:50%;background:${colors[name]||'var(--text3)'};display:inline-block"></span>
+      <span style="font-size:12px;color:var(--text)">${name}</span>
+      <span style="font-size:13px;font-weight:600;color:${colors[name]||'var(--text2)'}">${cnt}</span>
+      <span style="font-size:10px;color:var(--text3)">条</span>
+    </div>`).join('');
+}
+
 // ============ TAB ============
 let salesBuilt=false,detailBuilt=false,riskBuilt=false;
 function switchTab(tab){
@@ -641,7 +768,7 @@ function switchTab(tab){
   document.getElementById('page-'+tab).classList.add('active');
   if(tab==='sales'&&!salesBuilt){buildSalesPage();salesBuilt=true}
   if(tab==='detail'&&!detailBuilt){renderDetail();detailBuilt=true}
-  if(tab==='risk'&&!riskBuilt){buildRiskPage();riskBuilt=true}
+  if(tab==='risk'&&!riskBuilt){buildRiskPage();buildQKSection();riskBuilt=true}
 }
 
 document.addEventListener('DOMContentLoaded',buildOverview);
